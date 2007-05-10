@@ -10,7 +10,7 @@
 #include <xercesc/dom/DOMElement.hpp>
 XERCES_CPP_NAMESPACE_USE
 
-class 
+class
     Creator
 {
 

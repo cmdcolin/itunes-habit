@@ -5,6 +5,7 @@
 #include <xercesc/dom/DOMErrorHandler.hpp>
 #include <xercesc/dom/DOMNodeFilter.hpp>
 
+#include <string>
 #include <sstream>
 
 XERCES_CPP_NAMESPACE_USE

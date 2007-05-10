@@ -130,7 +130,7 @@ void Log::log(ITTrackInfoV1 & ti)
         << L":" << t.wSecond << L":" << t.wMilliseconds;
 
     song_child = m_doc->createElement(XS("time"));
-    song_child->appendChild(m_doc->createTextNode(wss.str().c_str()));
+    song_child->appendChild(m_doc->createTextNode((XMLCh*) wss.str().c_str()));
     song->appendChild(song_child);
 
     m_doc->getDocumentElement()->appendChild(song);
@@ -171,14 +171,14 @@ void Log::log(ITTrackInfo & ti)
         << L" " << t.wSecond << L" " << t.wMilliseconds;
 
     song_child = m_doc->createElement(XS("time"));
-    song_child->appendChild(m_doc->createTextNode(wss.str().c_str()));
+    song_child->appendChild(m_doc->createTextNode((XMLCh*) wss.str().c_str()));
     song->appendChild(song_child);
 
     m_doc->getDocumentElement()->appendChild(song);
 }
 
 
-std::map<std::wstring, int> Log::artistListeningDistribution() const
+std::map<std::basic_string<XMLCh>, int> Log::artistListeningDistribution() const
 {
     BOOST_LOGL(app, info) << __FUNCTION__;
 
@@ -186,7 +186,7 @@ std::map<std::wstring, int> Log::artistListeningDistribution() const
         m_doc->getDocumentElement(), DOMNodeFilter::SHOW_TEXT |
         DOMNodeFilter::SHOW_ELEMENT, 0, false);
 
-    std::map<std::wstring, int> m;
+    std::map<std::basic_string<XMLCh>, int> m;
 
     artistDistributionHelper(i, m);
 
@@ -236,13 +236,13 @@ std::vector<const DOMElement *> Log::lastPlayedSongs(unsigned int n) const
 }
 
 
-/* static */ void Log::artistDistributionHelper(DOMTreeWalker * k, std::map<std::wstring, int> & m)
+/* static */ void Log::artistDistributionHelper(DOMTreeWalker * k, std::map<std::basic_string<XMLCh>, int> & m)
 {
     DOMNode * n = k->getCurrentNode();
 
     if(n->getNodeType() == DOMNode::TEXT_NODE)
     {
-        if(std::wstring(n->getParentNode()->getNodeName()) == L"artist")
+        if(std::basic_string<XMLCh>(n->getParentNode()->getNodeName()) == XS("artist"))
         {
             m[n->getParentNode()->getTextContent()]++;
         }

@@ -11,9 +11,10 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+#include <windows.h>
 
 inline unsigned int rr(
-                       unsigned int start, 
+                       unsigned int start,
                        unsigned int end
                        )
 {
@@ -39,7 +40,7 @@ void Creator::createLastPlayedChart(const std::vector<const DOMElement *> & arr,
 
     int stringPlacement = 15;
 
-    for(std::vector<const DOMElement *>::const_iterator i = arr.begin(); 
+    for(std::vector<const DOMElement *>::const_iterator i = arr.begin();
         i != arr.end(); ++i)
     {
         SYSTEMTIME t;
@@ -47,13 +48,13 @@ void Creator::createLastPlayedChart(const std::vector<const DOMElement *> & arr,
 
         iss << (*i)->getElementsByTagName(XS("time"))->item(0)->getTextContent();
 
-        iss >> t.wYear >> t.wMonth >> t.wDay >> t.wDayOfWeek >> 
+        iss >> t.wYear >> t.wMonth >> t.wDay >> t.wDayOfWeek >>
             t.wHour >> t.wMinute >> t.wSecond >> t.wMilliseconds;
 
 
-        oss << std::setfill(L'0') << std::setw(2) << t.wHour << L":" 
-            << std::setfill(L'0') << std::setw(2) << t.wMinute << L":" 
-            << std::setfill(L'0') << std::setw(2) << t.wSecond << " - " 
+        oss << std::setfill(L'0') << std::setw(2) << t.wHour << L":"
+            << std::setfill(L'0') << std::setw(2) << t.wMinute << L":"
+            << std::setfill(L'0') << std::setw(2) << t.wSecond << " - "
             << (*i)->getElementsByTagName(XS("artist"))->item(0)->getTextContent() << " - "
             << (*i)->getElementsByTagName(XS("track"))->item(0)->getTextContent();
 
@@ -100,7 +101,7 @@ void Creator::createDynaLastPlayed(const std::vector<const DOMElement *> & arr, 
     DOMElement * items = doc->createElement(XS("items"));
 
     int x = 5, y = 5;
-    for(std::vector<const DOMElement *>::const_iterator i = arr.begin(); 
+    for(std::vector<const DOMElement *>::const_iterator i = arr.begin();
         i != arr.end(); ++i, y += 20)
     {
         SYSTEMTIME t;
@@ -109,15 +110,15 @@ void Creator::createDynaLastPlayed(const std::vector<const DOMElement *> & arr, 
 
         iss << (*i)->getElementsByTagName(XS("time"))->item(0)->getTextContent();
 
-        iss >> t.wYear >> t.wMonth >> t.wDay >> t.wDayOfWeek >> 
+        iss >> t.wYear >> t.wMonth >> t.wDay >> t.wDayOfWeek >>
             t.wHour >> t.wMinute >> t.wSecond >> t.wMilliseconds;
 
 
-        oss << std::setfill(L'0') << std::setw(2) << t.wMonth << L"/" 
-            << std::setfill(L'0') << std::setw(2) << t.wDay << L" " 
-            << std::setfill(L'0') << std::setw(2) << t.wHour << L":" 
-            << std::setfill(L'0') << std::setw(2) << t.wMinute << L":" 
-            << std::setfill(L'0') << std::setw(2) << t.wSecond << " - " 
+        oss << std::setfill(L'0') << std::setw(2) << t.wMonth << L"/"
+            << std::setfill(L'0') << std::setw(2) << t.wDay << L" "
+            << std::setfill(L'0') << std::setw(2) << t.wHour << L":"
+            << std::setfill(L'0') << std::setw(2) << t.wMinute << L":"
+            << std::setfill(L'0') << std::setw(2) << t.wSecond << " - "
             << (*i)->getElementsByTagName(XS("artist"))->item(0)->getTextContent() << " - "
             << (*i)->getElementsByTagName(XS("track"))->item(0)->getTextContent();
 
@@ -126,18 +127,18 @@ void Creator::createDynaLastPlayed(const std::vector<const DOMElement *> & arr, 
         DOMElement * position = doc->createElement(XS("position"));
         DOMElement * color = doc->createElement(XS("color"));
 
-        string->appendChild(doc->createTextNode(oss.str().c_str()));
+        string->appendChild(doc->createTextNode((XMLCh*) oss.str().c_str()));
         color->appendChild(doc->createTextNode(XS("0x000000")));
 
         oss.str(L"");
         oss << x;
         oss >> ws;
-        position->setAttribute(XS("x"), ws.c_str());
-        
+        position->setAttribute(XS("x"), (XMLCh*) ws.c_str());
+
         oss.str(L"");
         oss << y;
         oss >> ws;
-        position->setAttribute(XS("y"), ws.c_str());
+        position->setAttribute(XS("y"), (XMLCh*) ws.c_str());
 
         text->appendChild(string);
         text->appendChild(position);

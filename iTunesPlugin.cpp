@@ -10,7 +10,9 @@
 #include "httpUploader.hpp"
 
 #include "Resource.k"
+
 #define _WIN32_IE 0x301
+
 #include <tchar.h>
 #include <commctrl.h>
 
@@ -84,17 +86,17 @@ BOOL CALLBACK DlgProc(
     case WM_INITDIALOG:
         {
             /*
-            
+
             TCITEM t1, t2;
 
             t1.mask = TCIF_TEXT;
-            t1.pszText = TEXT("Internet");
+            t1.pszText = _T("Internet");
             t1.cchTextMax = (int) _tcslen(t1.pszText) + 1;
             t1.iImage = -1;
             t1.lParam = 0;
 
             t2.mask = TCIF_TEXT;
-            t2.pszText = TEXT("Image");
+            t2.pszText = _T("Image");
             t2.cchTextMax = (int) _tcslen(t2.pszText) + 1;
             t2.iImage = -1;
             t2.lParam = 0;
@@ -108,7 +110,7 @@ BOOL CALLBACK DlgProc(
             else
             {
                 int i = 0;
-                
+
                 i |= TabCtrl_InsertItem(r, 0, & t1);
                 i |= TabCtrl_InsertItem(r, 1, & t2);
 
@@ -133,7 +135,7 @@ BOOL CALLBACK DlgProc(
                     TCHAR   strz[3][256];
 
                     /*
-                    
+
                     for(int i = 0; i < 3; ++i)
                     {
                         tr[i] = ::GetDlgItemInt(dlg, IDC_EDIT1 + i, &ok[i], FALSE);
@@ -185,7 +187,7 @@ BOOL CALLBACK DlgProc(
     return FALSE;
 }
 
-int CALLBACK SheetProc(HWND dlg, UINT message, LPARAM lParam)
+INT WINAPI SheetProc(HWND dlg, UINT message, LPARAM lParam)
 {
     switch(message)
     {
@@ -301,30 +303,30 @@ DWORD WINAPI ThreadProc(LPVOID t)
     PROPSHEETPAGE m_psp[3] = {0};
 
     m_psp[0].dwSize     = sizeof(PROPSHEETPAGE);
-    m_psp[0].dwFlags    = PSP_DEFAULT | PSP_USETITLE;
-    m_psp[0].hInstance  = ::GetModuleHandle(TEXT("Itunesplugin.dll"));
+    m_psp[0].dwFlags    = PSP_USETITLE;
+    m_psp[0].hInstance  = ::GetModuleHandle(_T("Itunesplugin.dll"));
     m_psp[0].pszTemplate = MAKEINTRESOURCE(IDD_DIALOG_SUBONE);
-    m_psp[0].pszTitle   = TEXT("File Settings");
+    m_psp[0].pszTitle   = _T("File Settings");
     m_psp[1].pfnDlgProc = &DlgSubOne;
 
     m_psp[1].dwSize     = sizeof(PROPSHEETPAGE);
     m_psp[1].dwFlags    = PSP_USETITLE;
-    m_psp[1].hInstance  = ::GetModuleHandle(TEXT("Itunesplugin.dll"));
+    m_psp[1].hInstance  = ::GetModuleHandle(_T("Itunesplugin.dll"));
     m_psp[1].pszTemplate = MAKEINTRESOURCE(IDD_DIALOG_SUBTWO);
-    m_psp[1].pszTitle   = TEXT("Internet Settings");
+    m_psp[1].pszTitle   = _T("Internet Settings");
     m_psp[1].pfnDlgProc = &DlgSubTwo;
 
     m_psp[2].dwSize     = sizeof(PROPSHEETPAGE);
     m_psp[2].dwFlags    = PSP_USETITLE;
-    m_psp[2].hInstance  = ::GetModuleHandle(TEXT("Itunesplugin.dll"));
+    m_psp[2].hInstance  = ::GetModuleHandle(_T("Itunesplugin.dll"));
     m_psp[2].pszTemplate = MAKEINTRESOURCE(IDD_DIALOG_SUBTHREE);
-    m_psp[2].pszTitle   = TEXT("Image Settings");
+    m_psp[2].pszTitle   = _T("Image Settings");
     m_psp[2].pfnDlgProc = &DlgSubThree;
 
     m_PropSheet.dwSize      = sizeof(PROPSHEETHEADER);
-    m_PropSheet.dwFlags     =  PSH_PROPSHEETPAGE | PSH_USECALLBACK | PSH_MODELESS;
-    m_PropSheet.hInstance   = ::GetModuleHandle(TEXT("Itunesplugin.dll"));
-    m_PropSheet.pszCaption  = TEXT("Cell Properties");
+    m_PropSheet.dwFlags     = PSH_PROPSHEETPAGE | PSH_USECALLBACK | PSH_MODELESS;
+    m_PropSheet.hInstance   = ::GetModuleHandle(_T("Itunesplugin.dll"));
+    m_PropSheet.pszCaption  = _T("Cell Properties");
     m_PropSheet.nPages      = sizeof(m_psp) / sizeof(m_psp[0]);
     m_PropSheet.nStartPage  = 0;
     m_PropSheet.ppsp        = m_psp;
@@ -403,7 +405,7 @@ static OSStatus VisualPluginHandler(
             vpd->itunes = messageInfo->u.showWindowMessage.window;
 
             /*
-            
+
             HWND dlg = CreateDialogParam(
             GetModuleHandle(TEXT("Itunesplugin.dll")),
             MAKEINTRESOURCE(IDD_DIALOG),
@@ -707,10 +709,10 @@ extern "C" __declspec(dllexport) OSStatus iTunesPluginMain(
             using namespace boost::logging;
 
             flush_log_cache();
-            add_modifier(TEXT("*"), prepend_time(TEXT("$hh:$mm:$ss ")), TEXT(""), INT_MAX);
-            add_modifier(TEXT("*"), append_enter);
-            add_appender(TEXT("*"), write_to_dbg_wnd);
-            manipulate_logs(TEXT("*")).enable(level::enable_all);
+            add_modifier(_T("*"), prepend_time(_T("$hh:$mm:$ss ")), _T(""), INT_MAX);
+            add_modifier(_T("*"), append_enter);
+            add_appender(_T("*"), write_to_dbg_wnd);
+            manipulate_logs(_T("*")).enable(level::enable_all);
 
             normalizeCurrentDirectory();
             srand(seed());

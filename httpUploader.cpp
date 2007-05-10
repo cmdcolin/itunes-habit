@@ -42,12 +42,12 @@ int Uploader::uploadFile(const std::string & s)
 	curl_httppost * post = 0;
 	curl_httppost * last = 0;
 
-    curl_formadd(&post, &last, 
+    curl_formadd(&post, &last,
         CURLFORM_COPYNAME, "file",
         CURLFORM_FILE, s.c_str(),
         CURLFORM_END);
 
-    curl_formadd(&post, &last, 
+    curl_formadd(&post, &last,
         CURLFORM_COPYNAME, element.c_str(),
         CURLFORM_COPYCONTENTS, element_name.c_str(),
         CURLFORM_END);

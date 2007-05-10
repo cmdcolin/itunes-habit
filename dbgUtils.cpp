@@ -1,3 +1,4 @@
 #include "dbgUtils.hpp"
+#include <tchar.h>
 
-BOOST_DEFINE_LOG(app, TEXT("app"))
+BOOST_DEFINE_LOG(app, _T("app"))

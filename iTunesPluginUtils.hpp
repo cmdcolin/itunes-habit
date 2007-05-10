@@ -28,7 +28,7 @@ struct
         const std::basic_string<TCHAR> & elog
         ) :
 
-    error_log_file(elog), music_log_file(mlog),
+    music_log_file(mlog), error_log_file(elog),
         img_file(imgfike), grammar_file(grammar)
 
     {
