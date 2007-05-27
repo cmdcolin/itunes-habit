@@ -53,7 +53,6 @@
 #ifndef ITUNESAPI_H_
 #define ITUNESAPI_H_
 
-#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
 #if PRAGMA_ONCE

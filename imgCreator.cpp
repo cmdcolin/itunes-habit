@@ -11,6 +11,7 @@
 #include <fstream>
 #include <iostream>
 #include <iomanip>
+
 #include <windows.h>
 
 inline unsigned int rr(
@@ -21,24 +22,27 @@ inline unsigned int rr(
     if(start == end)
         return end;
 
-    return (rand() % (start - end)) + start;
+    return (rand() % (end - start)) + start;
 }
 
 
-void Creator::createLastPlayedChart(const std::vector<const DOMElement *> & arr, const std::basic_string<TCHAR> & file) const
+void Creator::createLastPlayedChart(
+                                    const std::vector<const DOMElement *> & arr, 
+                                    const std::basic_string<TCHAR> & file, 
+                                    const std::string & font,
+                                    int fsize
+                                    ) 
+                                    const
 {
     BOOST_LOGL(app, info) << __FUNCTION__;
 
-    gdFontPtr font = gdFontGetTiny();
-	gdWimage image(500, 97);
 
-    int brush = gdImageColorResolve(image.p, 255, 255, 255);
-    int pen = gdImageColorResolve(image.p, 0, 0, 0);
-
-    gdImageFilledRectangle(image.p, 1, 1, image.p->sx - 2, image.p->sy - 2, brush);
-    gdImageRectangle(image.p, 0, 0, image.p->sx - 1, image.p->sy - 1, pen);
 
     int stringPlacement = 15;
+    int bounds[8];
+
+    std::vector<char> v(font.begin(), font.end());
+    v.push_back('\0');
 
     for(std::vector<const DOMElement *>::const_iterator i = arr.begin();
         i != arr.end(); ++i)
@@ -52,36 +56,56 @@ void Creator::createLastPlayedChart(const std::vector<const DOMElement *> & arr,
             t.wHour >> t.wMinute >> t.wSecond >> t.wMilliseconds;
 
 
-        oss << std::setfill(L'0') << std::setw(2) << t.wHour << L":"
-            << std::setfill(L'0') << std::setw(2) << t.wMinute << L":"
-            << std::setfill(L'0') << std::setw(2) << t.wSecond << " - "
-            << (*i)->getElementsByTagName(XS("artist"))->item(0)->getTextContent() << " - "
+        oss << (*i)->getElementsByTagName(XS("artist"))->item(0)->getTextContent() << " - "
             << (*i)->getElementsByTagName(XS("track"))->item(0)->getTextContent();
 
         std::wstring temp = oss.str();
         std::vector<wchar_t> m(temp.begin(), temp.end());
         m.push_back(L'\0');
 
-        int b[] = { 10, stringPlacement + 20, 500, stringPlacement + 20, 10, stringPlacement, 500, stringPlacement };
-
         char sss[800];
-        ::WideCharToMultiByte(CP_UTF8, 0, &m[0], m.size(), sss, 800, 0, 0);
-        char * e = gdImageStringFT(image.p, b, pen, "C:/Documents and Settings/Tonto/My Documents/BEAUTYSC.TTF", 24, 0.0, 10, stringPlacement + 15, sss);
+        ::WideCharToMultiByte(CP_UTF8, 0, &m[0], (int) m.size(), sss, sizeof(sss), 0, 0);
+
+        char * e;
+
+/*std::setfill(L'0') << std::setw(2) << t.wHour << L":"
+            << std::setfill(L'0') << std::setw(2) << t.wMinute << L":"
+            << std::setfill(L'0') << std::setw(2) << t.wSecond << " - "
+            << */
+
+        e = gdImageStringFT(0, &bounds[0], 0, &v[0], fsize, 0.0, 0, 0, sss);
+        if(e)
+            BOOST_LOG(app) << e;
+
+        gdWimage image(bounds[2] - bounds[6] + 6, bounds[3] - bounds[7] + 6);
+
+        unsigned int 
+            r = rr(170, 255), 
+            g = rr(170, 255), 
+            b = rr(170, 255);
+
+        BOOST_LOGL(app, info) << r << " " << g << " " << b;
+        int brush = gdImageColorResolve(image.p, r, g, b);
+        int pen = gdImageColorResolve(image.p, 0, 0, 0);
+
+        gdImageFilledRectangle(image.p, 1, 1, image.p->sx - 2, image.p->sy - 2, brush);
+        gdImageRectangle(image.p, 0, 0, image.p->sx - 1, image.p->sy - 1, pen);
+
+        e = gdImageStringFT(image.p, &bounds[0], pen, &v[0], fsize, 0.0, 3 - bounds[6], 3 - bounds[7], sss);
 
         if(e)
             BOOST_LOG(app) << e;
 
-        stringPlacement += 29;
+        stringPlacement += fsize + int(fsize / 4.0);
+
+        std::fstream o(file.c_str(), std::ios::binary | std::ios::trunc | std::ios::out);
+
+        int size = 0;
+        void * rawJpegData = gdImageJpegPtr(image.p, &size, -1);
+
+        o.write(static_cast<char *>(rawJpegData), size);
+        gdFree(rawJpegData);
     }
-
-
-    std::fstream o(file.c_str(), std::ios::binary | std::ios::trunc | std::ios::out);
-
-    int size = 0;
-    void * rawJpegData = gdImageJpegPtr(image.p, &size, -1);
-
-    o.write(static_cast<char *>(rawJpegData), size);
-    gdFree(rawJpegData);
 }
 
 

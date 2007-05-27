@@ -4,6 +4,9 @@
 #include "iTunesVisualAPI.hpp"
 #include "iTunesPluginUtils.hpp"
 
+#include "foobar2000.h"
+#include "component.h"
+
 #include "dbgUtils.hpp"
 #include "gdUtils.hpp"
 #include "xmlLog.hpp"
@@ -65,129 +68,8 @@ LRESULT CALLBACK WndProc(
 }
 
 
-//
-// Handle plug-in notifications
-//
 
-
-BOOL CALLBACK DlgProc(
-                      HWND dlg,
-                      UINT message,
-                      WPARAM wParam,
-                      LPARAM lParam
-                      )
-{
-    VisualPluginData * vpd = reinterpret_cast<VisualPluginData *>
-        (::GetWindowLongPtr(dlg, GWLP_USERDATA));
-
-    switch (message)
-    {
-
-    case WM_INITDIALOG:
-        {
-            /*
-
-            TCITEM t1, t2;
-
-            t1.mask = TCIF_TEXT;
-            t1.pszText = _T("Internet");
-            t1.cchTextMax = (int) _tcslen(t1.pszText) + 1;
-            t1.iImage = -1;
-            t1.lParam = 0;
-
-            t2.mask = TCIF_TEXT;
-            t2.pszText = _T("Image");
-            t2.cchTextMax = (int) _tcslen(t2.pszText) + 1;
-            t2.iImage = -1;
-            t2.lParam = 0;
-
-            HWND r = GetDlgItem(dlg, IDC_OPTIONS);
-
-            if(!r)
-            {
-                BOOST_LOGL(app, err) << "Confused 1";
-            }
-            else
-            {
-                int i = 0;
-
-                i |= TabCtrl_InsertItem(r, 0, & t1);
-                i |= TabCtrl_InsertItem(r, 1, & t2);
-
-                if(i)
-                {
-                    BOOST_LOGL(app, err) << "Confused 2";
-                }
-            }
-
-            */
-        }
-        return TRUE;
-
-    case WM_COMMAND:
-        {
-            switch(LOWORD(wParam))
-            {
-                case 0x100:
-                {
-                    BOOL    ok[3];
-                    UINT    tr[3];
-                    TCHAR   strz[3][256];
-
-                    /*
-
-                    for(int i = 0; i < 3; ++i)
-                    {
-                        tr[i] = ::GetDlgItemInt(dlg, IDC_EDIT1 + i, &ok[i], FALSE);
-                        if(!ok)
-                        {
-                            ::MessageBox(dlg, TEXT("Field unfilled"), TEXT("Error"), MB_OK);
-                            return TRUE;
-                        }
-                    }
-
-                    for(int i = 0; i < 3; ++i)
-                    {
-                        UINT ret = ::GetDlgItemText(dlg, IDC_EDIT3 + i, strz[i], sizeof(strz[i]) / sizeof(TCHAR));
-                        if(!ret)
-                        {
-                            ::MessageBox(dlg, TEXT("Field unfilled"), TEXT("Error"), MB_OK);
-                            return TRUE;
-                        }
-                    }
-
-                    */
-
-                    ::DestroyWindow(dlg);
-                }
-                return TRUE;
-
-                case 0x101:
-                    {
-                        ::DestroyWindow(dlg);
-                    }
-                    return TRUE;
-            }
-        }
-
-    case WM_DESTROY:
-        {
-            ::PostQuitMessage(0);
-        }
-        return TRUE;
-
-    case WM_CLOSE:
-        {
-            ::DestroyWindow(dlg);
-        }
-        return TRUE;
-
-    }
-
-    return FALSE;
-}
-
-INT WINAPI SheetProc(HWND dlg, UINT message, LPARAM lParam)
+INT WINAPI SheetProc(HWND UNUSED(dlg), UINT message, LPARAM lParam)
 {
     switch(message)
     {
@@ -212,7 +94,7 @@ INT WINAPI SheetProc(HWND dlg, UINT message, LPARAM lParam)
 
 
 
-BOOL CALLBACK DlgSubOne(HWND dlg, UINT message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK DlgSubOne(HWND dlg, UINT message, WPARAM UNUSED(wParam), LPARAM lParam)
 {
     switch(message)
     {
@@ -238,7 +120,7 @@ BOOL CALLBACK DlgSubOne(HWND dlg, UINT message, WPARAM wParam, LPARAM lParam)
     return FALSE;
 }
 
-BOOL CALLBACK DlgSubTwo(HWND dlg, UINT message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK DlgSubTwo(HWND dlg, UINT message, WPARAM UNUSED(wParam), LPARAM lParam)
 {
     switch(message)
     {
@@ -267,7 +149,7 @@ BOOL CALLBACK DlgSubTwo(HWND dlg, UINT message, WPARAM wParam, LPARAM lParam)
 
 
 
-BOOL CALLBACK DlgSubThree(HWND dlg, UINT message, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK DlgSubThree(HWND dlg, UINT message, WPARAM UNUSED(wParam), LPARAM lParam)
 {
     switch(message)
     {
@@ -520,12 +402,14 @@ static OSStatus VisualPluginHandler(
             {
                 vpd->loggy->log(vpd->trackUniInfo);
 
-                vpd->ic.createLastPlayedChart(vpd->loggy->lastPlayedSongs(3), vpd->img_file);
-                vpd->ic.createDynaLastPlayed(vpd->loggy->lastPlayedSongs(3), vpd->img_file + TEXT(".rawr"));
+                vpd->ic.createLastPlayedChart(
+                    vpd->loggy->lastPlayedSongs(1), 
+                    vpd->img_file, 
+                    "C:/the_King__26_Queen_font.ttf",
+                    18);
 
-
-#if defined(_UNICODE)
-                if(!vpd->up.uploadFile(SX(vpd->img_file.c_str())))
+                #if defined(_UNICODE)
+                    if(!vpd->up.uploadFile(SX(vpd->img_file.c_str())))
 #else
                 if(!vpd->up.uploadFile(vpd->img_file.c_str()))
 #endif
@@ -558,14 +442,17 @@ static OSStatus VisualPluginHandler(
             {
                 vpd->loggy->log(vpd->trackUniInfo);
 
-                vpd->ic.createLastPlayedChart(vpd->loggy->lastPlayedSongs(3), vpd->img_file);
-                vpd->ic.createDynaLastPlayed(vpd->loggy->lastPlayedSongs(3), vpd->img_file + TEXT(".rawr"));
+                vpd->ic.createLastPlayedChart(
+                    vpd->loggy->lastPlayedSongs(1), 
+                    vpd->img_file, 
+                    "C:/the_King__26_Queen_font.ttf",
+                    18);
 
-#if defined(_UNICODE)
-                if(!vpd->up.uploadFile(SX(vpd->img_file.c_str())))
-#else
-                if(!vpd->up.uploadFile(vpd->img_file.c_str()))
-#endif
+                #if defined(_UNICODE)
+                    if(!vpd->up.uploadFile(SX(vpd->img_file.c_str())))
+                #else
+                    if(!vpd->up.uploadFile(vpd->img_file.c_str()))
+                #endif
                 {
                     BOOST_LOGL(app, err) << "Upload failed";
                 }
@@ -693,56 +580,205 @@ extern "C" __declspec(dllexport) BOOL WINAPI DllMain(
 // Entry point for the app
 //
 
-extern "C" __declspec(dllexport) OSStatus iTunesPluginMain(
-    OSType message,
-    PluginMessageInfo * messageInfo,
-    void * /* refCon */
-    )
+
+
+static HINSTANCE g_hIns;
+
+static pfc::string_simple g_name, g_full_path;
+
+static bool g_services_available = false, g_initialized = false;
+
+static foobar2000_api * g_api;
+
+namespace core_api
 {
-    OSStatus status = noErr;
 
-    switch (message)
+	HINSTANCE get_my_instance()
+	{
+		return g_hIns;
+	}
+
+	HWND get_main_window()
+	{
+		return g_api->get_main_window();
+	}
+
+	pcchar get_my_file_name()
+	{
+		return g_name;
+	}
+
+	pcchar get_my_full_path()
+	{
+		return g_full_path;
+	}
+
+	bool are_services_available()
+	{
+		return g_services_available;
+	}
+	bool assert_main_thread()
+	{
+		return (g_services_available && g_api) ? 
+            g_api->assert_main_thread() : true;
+	}
+
+	void ensure_main_thread() 
     {
+		if (!assert_main_thread()) 
+            throw exception_wrong_thread();
+	}
 
-    case kPluginluginInitMessage:
+	bool is_main_thread()
+	{
+		return (g_services_available && g_api) ? 
+            g_api->is_main_thread() : true;
+	}
+
+	pcchar get_profile_path()
+	{
+		return (g_services_available && g_api) ? 
+            g_api->get_profile_path() : 0;
+	}
+
+	bool is_shutting_down()
+	{
+		return (g_services_available && g_api) ? 
+            g_api->is_shutting_down() : g_initialized;
+	}
+	bool is_initializing()
+	{
+		return (g_services_available && g_api) ? 
+            g_api->is_initializing() : !g_initialized;
+	}
+}
+
+namespace 
+{
+	class foobar2000_client_impl : 
+        public foobar2000_client
+	{
+
+	public:
+
+		t_uint32 get_version() 
         {
-            using namespace boost::logging;
-
-            flush_log_cache();
-            add_modifier(_T("*"), prepend_time(_T("$hh:$mm:$ss ")), _T(""), INT_MAX);
-            add_modifier(_T("*"), append_enter);
-            add_appender(_T("*"), write_to_dbg_wnd);
-            manipulate_logs(_T("*")).enable(level::enable_all);
-
-            normalizeCurrentDirectory();
-            srand(seed());
-
-            BOOST_LOGL(app, info) << __FUNCTION__ << ": kPlugluginInitMessage";
-            status = RegisterPlugin(messageInfo);
+            return FOOBAR2000_CLIENT_VERSION;
         }
-        break;
 
-    case kPluginluginCleanupMessage:
+		pservice_factory_base get_service_list() 
         {
-            BOOST_LOGL(app, info) << __FUNCTION__ << ": kPluginluginCleanupMessage";
-            status = noErr;
+            return service_factory_base::__internal__list;
         }
-        break;
 
-    case kPluginlayerRegisterVisualPluginMessage:
+		void get_config(stream_writer * p_stream, abort_callback & p_abort) 
         {
-            BOOST_LOGL(app, info) << __FUNCTION__ << ": kPluginlayerRegisterVisualPluginMessage";
-            status = noErr;
-        }
-        break;
+			cfg_var::config_write_file(p_stream, p_abort);
+		}
 
-    default:
+		void set_config(stream_reader * p_stream, abort_callback & p_abort) 
         {
-            status = unimpErr;
-        }
-        break;
+			cfg_var::config_read_file(p_stream, p_abort);
+		}
 
+		void set_library_path(const char * path, const char * name) 
+        {
+			g_full_path = path;
+			g_name = name;
+		}
+
+		void services_init(bool val) 
+        {
+            ::MessageBox(0, L"h", 0, 0);
+
+			if (val) 
+                g_initialized = true;
+
+			g_services_available = val;
+		}
+
+		bool is_debug() 
+        {
+#ifdef _DEBUG
+			return true;
+#else
+			return false;
+#endif
+		}
+	};
+}
+
+static foobar2000_client_impl g_client;
+
+extern "C"
+{
+	__declspec(dllexport) foobar2000_client * _cdecl foobar2000_get_interface(foobar2000_api * p_api, HINSTANCE hIns)
+	{
+            ::MessageBox(0, L"h", 0, 0);
+
+		g_hIns = hIns;
+		g_api = p_api;
+
+		return &g_client;
+	}
+}
+
+
+
+extern "C"
+{
+    __declspec(dllexport) OSStatus iTunesPluginMain
+        (
+        OSType message,
+        PluginMessageInfo * messageInfo,
+        void * /* refCon */
+        )
+    {
+        OSStatus status = noErr;
+
+        switch (message)
+        {
+
+        case kPluginluginInitMessage:
+            {
+                using namespace boost::logging;
+
+                flush_log_cache();
+                add_modifier(_T("*"), prepend_time(_T("$hh:$mm:$ss ")), _T(""), INT_MAX);
+                add_modifier(_T("*"), append_enter);
+                add_appender(_T("*"), write_to_dbg_wnd);
+                manipulate_logs(_T("*")).enable(level::enable_all);
+
+                normalizeCurrentDirectory();
+                srand(seed());
+
+                BOOST_LOGL(app, info) << __FUNCTION__ << ": kPlugluginInitMessage";
+                status = RegisterPlugin(messageInfo);
+            }
+            break;
+
+        case kPluginluginCleanupMessage:
+            {
+                BOOST_LOGL(app, info) << __FUNCTION__ << ": kPluginluginCleanupMessage";
+                status = noErr;
+            }
+            break;
+
+        case kPluginlayerRegisterVisualPluginMessage:
+            {
+                BOOST_LOGL(app, info) << __FUNCTION__ << ": kPluginlayerRegisterVisualPluginMessage";
+                status = noErr;
+            }
+            break;
+
+        default:
+            {
+                status = unimpErr;
+            }
+            break;
+
+        }
+
+        return status;
     }
-
-    return status;
 }
