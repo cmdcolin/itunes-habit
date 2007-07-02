@@ -38,15 +38,16 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
+				AdditionalOptions="/GL&#x0D;&#x0A;&#x0D;&#x0A;"
 				Optimization="0"
 				AdditionalIncludeDirectories="C:\Bin\Foobarsdk\foobar2000\SDK;C:\Bin\Xerces\src;C:\Bin\Boost;&quot;C:\Bin\Libcurl\curl-7.13.1\include&quot;;C:\Bin\Libgd\include"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;PROJ_R, _DEBUG, WIN32, PLATFORM_WIN32, BOOST_LOG_NO_LIB"
-				MinimalRebuild="true"
-				BasicRuntimeChecks="3"
+				MinimalRebuild="false"
+				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="true"
-				DebugInformationFormat="4"
+				DebugInformationFormat="0"
 				ShowIncludes="false"
 			/>
 			<Tool
