@@ -1,7 +1,7 @@
 #pragma once
 
 #include "xmlUtils.hpp"
-#include "iTunesVisualAPI.hpp"
+#include "iTunesVisualAPI.h"
 
 #include <xercesc/sax/ErrorHandler.hpp>
 #include <xercesc/dom/DOMErrorHandler.hpp>

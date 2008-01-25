@@ -1,12 +1,11 @@
 #pragma once
 
-#include "dbgUtils.hpp"
-
 #include <tchar.h>
 #include <map>
 #include <string>
 #include <vector>
 
+#include "dbgUtils.hpp"
 #include <xercesc/dom/DOMElement.hpp>
 XERCES_CPP_NAMESPACE_USE
 

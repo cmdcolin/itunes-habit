@@ -3,10 +3,9 @@
 #include <xercesc/dom/DOMException.hpp>
 #include <curl/curl.h>
 
-#include "iTunesAPI.hpp"
-#include "iTunesVisualAPI.hpp"
+#include "iTunesAPI.h"
+#include "iTunesVisualAPI.h"
 
-#include "dbgUtils.hpp"
 #include "xmlLog.hpp"
 #include "imgCreator.hpp"
 #include "httpUploader.hpp"
@@ -19,9 +18,9 @@
 
 
 struct
-    VisualPluginData
+    VisualPluginDataz
 {
-    VisualPluginData(
+    VisualPluginDataz(
         const std::basic_string<TCHAR> & mlog,
         const std::basic_string<TCHAR> & imgfike,
         const std::basic_string<TCHAR> & grammar,
@@ -47,6 +46,7 @@ struct
             else
             {
                 ::CloseHandle(file);
+
                 loggy = new Log(music_log_file.c_str(), true);
             }
         }
@@ -60,7 +60,7 @@ struct
         }
     }
 
-    ~VisualPluginData()
+    ~VisualPluginDataz()
     {
         BOOST_LOGL(app, info) << __FUNCTION__;
 
@@ -145,7 +145,7 @@ BOOL CALLBACK DlgProc(
                       LPARAM lParam
                       );
 
-extern "C" __declspec(dllexport) BOOL WINAPI DllMain(
+BOOL WINAPI DllMain(
     HINSTANCE /* instance */,
     DWORD reason,
     LPVOID /* reserved */

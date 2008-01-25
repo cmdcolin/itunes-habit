@@ -1,7 +1,7 @@
 #include "imgCreator.hpp"
 #include "gdUtils.hpp"
-#include "dbgUtils.hpp"
 #include "xmlUtils.hpp"
+#include "dbgUtils.hpp"
 
 #include <xercesc/dom/DOMNodeList.hpp>
 #include <xercesc/dom/DOM.hpp>
@@ -35,8 +35,6 @@ void Creator::createLastPlayedChart(
                                     const
 {
     BOOST_LOGL(app, info) << __FUNCTION__;
-
-
 
     int stringPlacement = 15;
     int bounds[8];

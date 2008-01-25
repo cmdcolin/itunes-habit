@@ -1,57 +1,51 @@
-/*
-	File:		iTunesAPI.c
-
-    Contains:   iTunes Plug-ins interfaces
- 
-    Version:    Technology: iTunes
-                Release:    4.1
-
-	Copyright: 	© Copyright 2003 Apple Computer, Inc. All rights reserved.
-	
-	Disclaimer:	IMPORTANT:  This Apple software is supplied to you by Apple Computer, Inc.
-				("Apple") in consideration of your agreement to the following terms, and your
-				use, installation, modification or redistribution of this Apple software
-				constitutes acceptance of these terms.  If you do not agree with these terms,
-				please do not use, install, modify or redistribute this Apple software.
-
-				In consideration of your agreement to abide by the following terms, and subject
-				to these terms, Apple grants you a personal, non-exclusive license, under AppleÕs
-				copyrights in this original Apple software (the "Apple Software"), to use,
-				reproduce, modify and redistribute the Apple Software, with or without
-				modifications, in source and/or binary forms; provided that if you redistribute
-				the Apple Software in its entirety and without modifications, you must retain
-				this notice and the following text and disclaimers in all such redistributions of
-				the Apple Software.  Neither the name, trademarks, service marks or logos of
-				Apple Computer, Inc. may be used to endorse or promote products derived from the
-				Apple Software without specific prior written permission from Apple.  Except as
-				expressly stated in this notice, no other rights or licenses, express or implied,
-				are granted by Apple herein, including but not limited to any patent rights that
-				may be infringed by your derivative works or by other works in which the Apple
-				Software may be incorporated.
-
-				The Apple Software is provided by Apple on an "AS IS" basis.  APPLE MAKES NO
-				WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION THE IMPLIED
-				WARRANTIES OF NON-INFRINGEMENT, MERCHANTABILITY AND FITNESS FOR A PARTICULAR
-				PURPOSE, REGARDING THE APPLE SOFTWARE OR ITS USE AND OPERATION ALONE OR IN
-				COMBINATION WITH YOUR PRODUCTS.
-
-				IN NO EVENT SHALL APPLE BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL OR
-				CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
-				GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-				ARISING IN ANY WAY OUT OF THE USE, REPRODUCTION, MODIFICATION AND/OR DISTRIBUTION
-				OF THE APPLE SOFTWARE, HOWEVER CAUSED AND WHETHER UNDER THEORY OF CONTRACT, TORT
-				(INCLUDING NEGLIGENCE), STRICT LIABILITY OR OTHERWISE, EVEN IF APPLE HAS BEEN
-				ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- 
-     Bugs?:      For bug reports, consult the following page on
-                 the World Wide Web:
- 
-                     http://developer.apple.com/bugreporter/
-
-*/
-
-#include "iTunesAPI.hpp"
-#include "iTunesVisualAPI.hpp"
+//
+// File:       iTunesAPI.c
+//
+// Abstract:   part of iTunes Visual SDK
+//
+// Version:    1.2
+//
+// Disclaimer: IMPORTANT:  This Apple software is supplied to you by Apple Inc. ( "Apple" )
+//             in consideration of your agreement to the following terms, and your use,
+//             installation, modification or redistribution of this Apple software
+//             constitutes acceptance of these terms.  If you do not agree with these
+//             terms, please do not use, install, modify or redistribute this Apple
+//             software.
+//
+//             In consideration of your agreement to abide by the following terms, and
+//             subject to these terms, Apple grants you a personal, non - exclusive
+//             license, under Apple's copyrights in this original Apple software ( the
+//             "Apple Software" ), to use, reproduce, modify and redistribute the Apple
+//             Software, with or without modifications, in source and / or binary forms;
+//             provided that if you redistribute the Apple Software in its entirety and
+//             without modifications, you must retain this notice and the following text
+//             and disclaimers in all such redistributions of the Apple Software. Neither
+//             the name, trademarks, service marks or logos of Apple Inc. may be used to
+//             endorse or promote products derived from the Apple Software without specific
+//             prior written permission from Apple.  Except as expressly stated in this
+//             notice, no other rights or licenses, express or implied, are granted by
+//             Apple herein, including but not limited to any patent rights that may be
+//             infringed by your derivative works or by other works in which the Apple
+//             Software may be incorporated.
+//
+//             The Apple Software is provided by Apple on an "AS IS" basis.  APPLE MAKES NO
+//             WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION THE IMPLIED
+//             WARRANTIES OF NON - INFRINGEMENT, MERCHANTABILITY AND FITNESS FOR A
+//             PARTICULAR PURPOSE, REGARDING THE APPLE SOFTWARE OR ITS USE AND OPERATION
+//             ALONE OR IN COMBINATION WITH YOUR PRODUCTS.
+//
+//             IN NO EVENT SHALL APPLE BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL OR
+//             CONSEQUENTIAL DAMAGES ( INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+//             SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+//             INTERRUPTION ) ARISING IN ANY WAY OUT OF THE USE, REPRODUCTION, MODIFICATION
+//             AND / OR DISTRIBUTION OF THE APPLE SOFTWARE, HOWEVER CAUSED AND WHETHER
+//             UNDER THEORY OF CONTRACT, TORT ( INCLUDING NEGLIGENCE ), STRICT LIABILITY OR
+//             OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// Copyright ( C ) 2000-2007 Apple Inc. All Rights Reserved.
+//
+#include "iTunesAPI.h"
+#include "iTunesVisualAPI.h"
 
 
 
@@ -105,21 +99,13 @@ OSStatus PlayerSetFullScreen (void *appCookie, ITAppProcPtr appProc, Boolean ful
 	
 	messageInfo.u.setFullScreenMessage.fullScreen = fullScreen;
 
-	return ITCallApplication(appCookie, appProc, kPluginlayerSetFullScreenMessage, &messageInfo);
+	return ITCallApplication(appCookie, appProc, kPlayerSetFullScreenMessage, &messageInfo);
 }
 
 
 // PlayerSetFullScreenOptions
 //
-OSStatus PlayerSetFullScreenOptions(
-                                    void *appCookie, 
-                                    ITAppProcPtr appProc, 
-                                    SInt16 minBitDepth, 
-                                    SInt16 maxBitDepth, 
-                                    SInt16 preferredBitDepth, 
-                                    SInt16 desiredWidth, 
-                                    SInt16 desiredHeight
-                                    )
+OSStatus PlayerSetFullScreenOptions (void *appCookie, ITAppProcPtr appProc, SInt16 minBitDepth, SInt16 maxBitDepth, SInt16 preferredBitDepth, SInt16 desiredWidth, SInt16 desiredHeight)
 {
 	PlayerMessageInfo	messageInfo;
 	
@@ -131,17 +117,12 @@ OSStatus PlayerSetFullScreenOptions(
 	messageInfo.u.setFullScreenOptionsMessage.desiredWidth		= desiredWidth;
 	messageInfo.u.setFullScreenOptionsMessage.desiredHeight		= desiredHeight;
 
-	return ITCallApplication(appCookie, appProc, kPluginlayerSetFullScreenOptionsMessage, &messageInfo);
+	return ITCallApplication(appCookie, appProc, kPlayerSetFullScreenOptionsMessage, &messageInfo);
 }
 
 // PlayerGetCurrentTrackCoverArt
 //
-OSStatus PlayerGetCurrentTrackCoverArt(
-                                       void *appCookie, 
-                                       ITAppProcPtr appProc, 
-                                       Handle *coverArt, 
-                                       OSType *coverArtFormat
-                                       )
+OSStatus PlayerGetCurrentTrackCoverArt (void *appCookie, ITAppProcPtr appProc, Handle *coverArt, OSType *coverArtFormat)
 {
 	OSStatus			status;
 	PlayerMessageInfo	messageInfo;
@@ -150,7 +131,7 @@ OSStatus PlayerGetCurrentTrackCoverArt(
 	
 	messageInfo.u.getCurrentTrackCoverArtMessage.coverArt = nil;
 
-	status = ITCallApplication(appCookie, appProc, kPluginlayerGetCurrentTrackCoverArtMessage, &messageInfo);
+	status = ITCallApplication(appCookie, appProc, kPlayerGetCurrentTrackCoverArtMessage, &messageInfo);
 
 	*coverArt = messageInfo.u.getCurrentTrackCoverArtMessage.coverArt;
 	if (coverArtFormat)
@@ -160,13 +141,7 @@ OSStatus PlayerGetCurrentTrackCoverArt(
 
 // PlayerGetPluginData
 //
-OSStatus PlayerGetPluginData(
-                             void *appCookie, 
-                             ITAppProcPtr appProc, 
-                             void *dataPtr, 
-                             UInt32 dataBufferSize, 
-                             UInt32 *dataSize
-                             )
+OSStatus PlayerGetPluginData (void *appCookie, ITAppProcPtr appProc, void *dataPtr, UInt32 dataBufferSize, UInt32 *dataSize)
 {
 	OSStatus			status;
 	PlayerMessageInfo	messageInfo;
@@ -176,7 +151,7 @@ OSStatus PlayerGetPluginData(
 	messageInfo.u.getPluginDataMessage.dataPtr			= dataPtr;
 	messageInfo.u.getPluginDataMessage.dataBufferSize	= dataBufferSize;
 	
-	status = ITCallApplication(appCookie, appProc, kPluginlayerGetPluginDataMessage, &messageInfo);
+	status = ITCallApplication(appCookie, appProc, kPlayerGetPluginDataMessage, &messageInfo);
 	
 	if (dataSize != nil)
 		*dataSize = messageInfo.u.getPluginDataMessage.dataSize;
@@ -187,12 +162,7 @@ OSStatus PlayerGetPluginData(
 
 // PlayerSetPluginData
 //
-OSStatus PlayerSetPluginData(
-                             void *appCookie, 
-                             ITAppProcPtr appProc, 
-                             void *dataPtr, 
-                             UInt32 dataSize
-                             )
+OSStatus PlayerSetPluginData (void *appCookie, ITAppProcPtr appProc, void *dataPtr, UInt32 dataSize)
 {
 	PlayerMessageInfo	messageInfo;
 	
@@ -201,20 +171,13 @@ OSStatus PlayerSetPluginData(
 	messageInfo.u.setPluginDataMessage.dataPtr	= dataPtr;
 	messageInfo.u.setPluginDataMessage.dataSize	= dataSize;
 	
-	return ITCallApplication(appCookie, appProc, kPluginlayerSetPluginDataMessage, &messageInfo);
+	return ITCallApplication(appCookie, appProc, kPlayerSetPluginDataMessage, &messageInfo);
 }
 
 
 // PlayerGetPluginNamedData
 //
-OSStatus PlayerGetPluginNamedData(
-                                  void *appCookie, 
-                                  ITAppProcPtr appProc, 
-                                  ConstStringPtr dataName, 
-                                  void *dataPtr, 
-                                  UInt32 dataBufferSize, 
-                                  UInt32 *dataSize
-                                  )
+OSStatus PlayerGetPluginNamedData (void *appCookie, ITAppProcPtr appProc, ConstStringPtr dataName, void *dataPtr, UInt32 dataBufferSize, UInt32 *dataSize)
 {
 	OSStatus			status;
 	PlayerMessageInfo	messageInfo;
@@ -225,7 +188,7 @@ OSStatus PlayerGetPluginNamedData(
 	messageInfo.u.getPluginNamedDataMessage.dataPtr			= dataPtr;
 	messageInfo.u.getPluginNamedDataMessage.dataBufferSize	= dataBufferSize;
 	
-	status = ITCallApplication(appCookie, appProc, kPluginlayerGetPluginNamedDataMessage, &messageInfo);
+	status = ITCallApplication(appCookie, appProc, kPlayerGetPluginNamedDataMessage, &messageInfo);
 	
 	if (dataSize != nil)
 		*dataSize = messageInfo.u.getPluginNamedDataMessage.dataSize;
@@ -236,13 +199,7 @@ OSStatus PlayerGetPluginNamedData(
 
 // PlayerSetPluginNamedData
 //
-OSStatus PlayerSetPluginNamedData(
-                                  void *appCookie, 
-                                  ITAppProcPtr appProc, 
-                                  ConstStringPtr dataName, 
-                                  void *dataPtr, 
-                                  UInt32 dataSize
-                                  )
+OSStatus PlayerSetPluginNamedData (void *appCookie, ITAppProcPtr appProc, ConstStringPtr dataName, void *dataPtr, UInt32 dataSize)
 {
 	PlayerMessageInfo	messageInfo;
 	
@@ -252,7 +209,7 @@ OSStatus PlayerSetPluginNamedData(
 	messageInfo.u.setPluginNamedDataMessage.dataPtr		= dataPtr;
 	messageInfo.u.setPluginNamedDataMessage.dataSize	= dataSize;
 	
-	return ITCallApplication(appCookie, appProc, kPluginlayerSetPluginNamedDataMessage, &messageInfo);
+	return ITCallApplication(appCookie, appProc, kPlayerSetPluginNamedDataMessage, &messageInfo);
 }
 
 
@@ -260,21 +217,21 @@ OSStatus PlayerSetPluginNamedData(
 //
 OSStatus PlayerIdle (void *appCookie, ITAppProcPtr appProc)
 {
-	return ITCallApplication(appCookie, appProc, kPluginlayerIdleMessage, nil);
+	return ITCallApplication(appCookie, appProc, kPlayerIdleMessage, nil);
 }
 
 
 // PlayerShowAbout
 //
-void PlayerShowAbout(void *appCookie, ITAppProcPtr appProc)
+void PlayerShowAbout (void *appCookie, ITAppProcPtr appProc)
 {
-	ITCallApplication(appCookie, appProc, kPluginlayerShowAboutMessage, nil);
+	ITCallApplication(appCookie, appProc, kPlayerShowAboutMessage, nil);
 }
 
 
 // PlayerOpenURL
 //
-void PlayerOpenURL(void *appCookie, ITAppProcPtr appProc, SInt8 *string, UInt32 length)
+void PlayerOpenURL (void *appCookie, ITAppProcPtr appProc, SInt8 *string, UInt32 length)
 {
 	PlayerMessageInfo	messageInfo;
 	
@@ -283,14 +240,14 @@ void PlayerOpenURL(void *appCookie, ITAppProcPtr appProc, SInt8 *string, UInt32 
 	messageInfo.u.openURLMessage.url	= string;
 	messageInfo.u.openURLMessage.length	= length;
 
-	ITCallApplication(appCookie, appProc, kPluginlayerOpenURLMessage, &messageInfo);
+	ITCallApplication(appCookie, appProc, kPlayerOpenURLMessage, &messageInfo);
 }
 
 // PlayerUnregisterPlugin
 //
 OSStatus PlayerUnregisterPlugin (void *appCookie, ITAppProcPtr appProc, PlayerMessageInfo *messageInfo)
 {
-	return ITCallApplication(appCookie, appProc, kPluginlayerUnregisterPluginMessage, messageInfo);
+	return ITCallApplication(appCookie, appProc, kPlayerUnregisterPluginMessage, messageInfo);
 }
 
 
@@ -298,9 +255,43 @@ OSStatus PlayerUnregisterPlugin (void *appCookie, ITAppProcPtr appProc, PlayerMe
 //
 OSStatus PlayerRegisterVisualPlugin (void *appCookie, ITAppProcPtr appProc, PlayerMessageInfo *messageInfo)
 {
-	return ITCallApplicationInternal(appCookie, appProc, kPluginlayerRegisterVisualPluginMessage, kITVisualPluginMajorMessageVersion, kITVisualPluginMinorMessageVersion, messageInfo);
+	return ITCallApplicationInternal(appCookie, appProc, kPlayerRegisterVisualPluginMessage, kITVisualPluginMajorMessageVersion, kITVisualPluginMinorMessageVersion, messageInfo);
 }
 
+
+// PlayerHandleMacOSEvent
+//
+OSStatus PlayerHandleMacOSEvent (void *appCookie, ITAppProcPtr appProc, const EventRecord *theEvent, Boolean *eventHandled)
+{
+	PlayerMessageInfo	messageInfo;
+	OSStatus			status;
+	
+	ZeroMemory(&messageInfo, sizeof(messageInfo));
+	
+	messageInfo.u.handleMacOSEventMessage.theEvent = theEvent;
+		
+	status = ITCallApplication(appCookie, appProc, kPlayerHandleMacOSEventMessage, &messageInfo);
+	
+	if( eventHandled != nil )
+		*eventHandled = messageInfo.u.handleMacOSEventMessage.handled;
+	
+	return status;
+}
+
+// PlayerGetPluginFileSpec
+//
+#if TARGET_OS_MAC
+OSStatus PlayerGetPluginFileSpec (void *appCookie, ITAppProcPtr appProc, FSSpec *pluginFileSpec)
+{
+	PlayerMessageInfo	messageInfo;
+	
+	ZeroMemory(&messageInfo, sizeof(messageInfo));
+	
+	messageInfo.u.getPluginFileSpecMessage.fileSpec = pluginFileSpec;
+	
+	return ITCallApplication(appCookie, appProc, kPlayerGetPluginFileSpecMessage, &messageInfo);
+}
+#endif	// TARGET_OS_MAC
 
 // PlayerGetPluginITFileSpec
 //
@@ -312,9 +303,8 @@ OSStatus PlayerGetPluginITFileSpec (void *appCookie, ITAppProcPtr appProc, ITFil
 	
 	messageInfo.u.getPluginITFileSpecMessage.fileSpec = pluginFileSpec;
 	
-	return ITCallApplication(appCookie, appProc, kPluginlayerGetPluginITFileSpecMessage, &messageInfo);
+	return ITCallApplication(appCookie, appProc, kPlayerGetPluginITFileSpecMessage, &messageInfo);
 }
-
 
 // PlayerGetFileTrackInfo
 //
@@ -327,7 +317,7 @@ OSStatus PlayerGetFileTrackInfo (void *appCookie, ITAppProcPtr appProc, const IT
 	messageInfo.u.getFileTrackInfoMessage.fileSpec 	= fileSpec;
 	messageInfo.u.getFileTrackInfoMessage.trackInfo = trackInfo;
 	
-	return ITCallApplication(appCookie, appProc, kPluginlayerGetFileTrackInfoMessage, &messageInfo);
+	return ITCallApplication(appCookie, appProc, kPlayerGetFileTrackInfoMessage, &messageInfo);
 }
 
 // PlayerSetFileTrackInfo
@@ -341,7 +331,7 @@ OSStatus PlayerSetFileTrackInfo (void *appCookie, ITAppProcPtr appProc, const IT
 	messageInfo.u.setFileTrackInfoMessage.fileSpec 	= fileSpec;
 	messageInfo.u.setFileTrackInfoMessage.trackInfo = trackInfo;
 	
-	return ITCallApplication(appCookie, appProc, kPluginlayerSetFileTrackInfoMessage, &messageInfo);
+	return ITCallApplication(appCookie, appProc, kPlayerSetFileTrackInfoMessage, &messageInfo);
 }
 
 // PlayerGetITTrackInfoSize
@@ -360,7 +350,7 @@ OSStatus PlayerGetITTrackInfoSize (void *appCookie, ITAppProcPtr appProc, UInt32
 	
 	ZeroMemory(&messageInfo, sizeof(messageInfo));
 	
-	status = ITCallApplication(appCookie, appProc, kPluginlayerGetITTrackInfoSizeMessage, &messageInfo);
+	status = ITCallApplication(appCookie, appProc, kPlayerGetITTrackInfoSizeMessage, &messageInfo);
 	if( status == noErr )
 	{
 		*itTrackInfoSize = messageInfo.u.getITTrackInfoSizeMessage.itTrackInfoSize;
@@ -369,7 +359,7 @@ OSStatus PlayerGetITTrackInfoSize (void *appCookie, ITAppProcPtr appProc, UInt32
 	{
 		// iTunes 2.0.x
 		
-		// *itTrackInfoSize = ((UInt32) &((ITTrackInfo *) 0)->composer);
+		*itTrackInfoSize = ((UInt32) &((ITTrackInfo *) 0)->composer);
 		
 		status = noErr;
 	}
@@ -377,13 +367,13 @@ OSStatus PlayerGetITTrackInfoSize (void *appCookie, ITAppProcPtr appProc, UInt32
 	{
 		// iTunes 3.0.x
 		
-		// *itTrackInfoSize = ((UInt32) &((ITTrackInfo *) 0)->beatsPerMinute);
+		*itTrackInfoSize = ((UInt32) &((ITTrackInfo *) 0)->beatsPerMinute);
 		
 		status = noErr;
 	}
 	else
 	{
-		// iTunes 4.0 and later implement the kPluginlayerGetITTrackInfoSizeMessage message. If you got here
+		// iTunes 4.0 and later implement the kPlayerGetITTrackInfoSizeMessage message. If you got here
 		// then the appPluginMajorVersion or appPluginMinorVersion are incorrect.
 		
 		status = paramErr;

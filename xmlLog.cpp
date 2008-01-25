@@ -3,7 +3,7 @@
 #include "xmlLog.hpp"
 #include "dbgUtils.hpp"
 #include "gdUtils.hpp"
-#include "iTunesVisualAPI.hpp"
+#include "iTunesVisualAPI.h"
 
 #include <xercesc/dom/DOM.hpp>
 #include <xercesc/dom/DOMImplementation.hpp>
@@ -23,6 +23,8 @@ Log::Log(
     {
         parser.reset(new XercesDOMParser());
 
+        BOOST_LOGL(app, info) << __FUNCTION__;
+
         parser->setErrorHandler(std::auto_ptr<ErrorReporter>(new ErrorReporter()).get());
         parser->setValidationScheme(XercesDOMParser::Val_Always);
         parser->setDoNamespaces(false);
@@ -30,11 +32,31 @@ Log::Log(
         parser->setValidationSchemaFullChecking(true);
         parser->setLoadExternalDTD(true);
 
-        parser->parse(t.c_str());
+        BOOST_LOGL(app, info) << __FUNCTION__ << ": " << t.c_str();
+
+        try
+        {
+            parser->parse(t.c_str());
+        }
+        catch(XMLException & e)
+        {
+            BOOST_LOGL(app, info) << __FUNCTION__ << ": Rad - " << e.getMessage();
+        }
+        catch(DOMException & e)
+        {
+            BOOST_LOGL(app, info) << __FUNCTION__ << ": Bad - " << e.getMessage();
+        }
+        catch(...)
+        {
+            BOOST_LOGL(app, info) << __FUNCTION__ << ": Unknown exception";
+        }
+
+        BOOST_LOGL(app, info) << __FUNCTION__;
+
         m_doc = parser->getDocument();
         m_release_doc = false;
 
-        BOOST_LOGL(app, info) << __FUNCTION__ << ": Log Parsed";
+        BOOST_LOGL(app, info) << __FUNCTION__ << ": Log Parsed: " << m_doc;
     }
 
     else
@@ -45,9 +67,9 @@ Log::Log(
         DOMDocumentType * dtype = impl->createDocumentType(XS("log"), XS("id"),
 
 #ifndef _UNICODE
-                XS(t.c_str()));
+        XS(t.c_str()));
 #else
-                t.c_str());
+        t.c_str());
 #endif
 
         m_doc = impl->createDocument(XS("root"), XS("log"), dtype);
@@ -98,28 +120,38 @@ void Log::serialize(const std::basic_string<TCHAR> & s) const
 
 void Log::log(ITTrackInfoV1 & ti)
 {
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    BOOST_LOGL(app, info) << __FUNCTION__ << " " << m_doc;
+
+    if(!m_doc)
+    {
+        BOOST_LOGL(app, info) << __FUNCTION__ << ": No log";
+        return;
+    }
 
     DOMElement * song = m_doc->createElement(XS("song"));
     DOMElement * song_child = 0;
 
+    BOOST_LOGL(app, info) << __FUNCTION__;
     song_child = m_doc->createElement(XS("artist"));
     song_child->appendChild(m_doc->createTextNode
         (XS(reinterpret_cast<char *>(ti.artist + 1))));
     song->appendChild(song_child);
 
 
+    BOOST_LOGL(app, info) << __FUNCTION__;
     song_child = m_doc->createElement(XS("album"));
     song_child->appendChild(m_doc->createTextNode
         (XS(reinterpret_cast<char *>(ti.album + 1))));
     song->appendChild(song_child);
 
 
+    BOOST_LOGL(app, info) << __FUNCTION__;
     song_child = m_doc->createElement(XS("track"));
     song_child->appendChild(m_doc->createTextNode
         (XS(reinterpret_cast<char *>(ti.name + 1))));
     song->appendChild(song_child);
 
+    BOOST_LOGL(app, info) << __FUNCTION__;
     SYSTEMTIME t;
     ::GetLocalTime(&t);
 
@@ -138,17 +170,21 @@ void Log::log(ITTrackInfoV1 & ti)
 
 void Log::log(ITTrackInfo & ti)
 {
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    BOOST_LOGL(app, info) << __FUNCTION__ << " " << m_doc;
+
+    if(!m_doc)
+    {
+        BOOST_LOGL(app, info) << __FUNCTION__ << ": No log";
+        return;
+    }
 
     DOMElement * song = m_doc->createElement(XS("song"));
     DOMElement * song_child = 0;
-
 
     song_child = m_doc->createElement(XS("artist"));
     song_child->appendChild(m_doc->createTextNode
         (reinterpret_cast<XMLCh *>(ti.artist + 1)));
     song->appendChild(song_child);
-
 
     song_child = m_doc->createElement(XS("album"));
     song_child->appendChild(m_doc->createTextNode

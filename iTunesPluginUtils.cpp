@@ -1,4 +1,5 @@
 #include "iTunesPluginUtils.hpp"
+#include "dbgUtils.hpp"
 
 
 unsigned int seed()

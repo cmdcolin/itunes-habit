@@ -1,340 +1,355 @@
-#define _CRT_SECURE_NO_WARNINGS
-#define _SCL_SECURE_NO_WARNINGS
+//
+// File:       iTunesPlugIn.c
+//
+// Abstract:   visual plug-in for iTunes
+//
+// Version:    1.2
+//
+// Disclaimer: IMPORTANT:  This Apple software is supplied to you by Apple Inc. ( "Apple" )
+//             in consideration of your agreement to the following terms, and your use,
+//             installation, modification or redistribution of this Apple software
+//             constitutes acceptance of these terms.  If you do not agree with these
+//             terms, please do not use, install, modify or redistribute this Apple
+//             software.
+//
+//             In consideration of your agreement to abide by the following terms, and
+//             subject to these terms, Apple grants you a personal, non - exclusive
+//             license, under Apple's copyrights in this original Apple software ( the
+//             "Apple Software" ), to use, reproduce, modify and redistribute the Apple
+//             Software, with or without modifications, in source and / or binary forms;
+//             provided that if you redistribute the Apple Software in its entirety and
+//             without modifications, you must retain this notice and the following text
+//             and disclaimers in all such redistributions of the Apple Software. Neither
+//             the name, trademarks, service marks or logos of Apple Inc. may be used to
+//             endorse or promote products derived from the Apple Software without specific
+//             prior written permission from Apple.  Except as expressly stated in this
+//             notice, no other rights or licenses, express or implied, are granted by
+//             Apple herein, including but not limited to any patent rights that may be
+//             infringed by your derivative works or by other works in which the Apple
+//             Software may be incorporated.
+//
+//             The Apple Software is provided by Apple on an "AS IS" basis.  APPLE MAKES NO
+//             WARRANTIES, EXPRESS OR IMPLIED, INCLUDING WITHOUT LIMITATION THE IMPLIED
+//             WARRANTIES OF NON - INFRINGEMENT, MERCHANTABILITY AND FITNESS FOR A
+//             PARTICULAR PURPOSE, REGARDING THE APPLE SOFTWARE OR ITS USE AND OPERATION
+//             ALONE OR IN COMBINATION WITH YOUR PRODUCTS.
+//
+//             IN NO EVENT SHALL APPLE BE LIABLE FOR ANY SPECIAL, INDIRECT, INCIDENTAL OR
+//             CONSEQUENTIAL DAMAGES ( INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+//             SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+//             INTERRUPTION ) ARISING IN ANY WAY OUT OF THE USE, REPRODUCTION, MODIFICATION
+//             AND / OR DISTRIBUTION OF THE APPLE SOFTWARE, HOWEVER CAUSED AND WHETHER
+//             UNDER THEORY OF CONTRACT, TORT ( INCLUDING NEGLIGENCE ), STRICT LIABILITY OR
+//             OTHERWISE, EVEN IF APPLE HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
+// Copyright ( C ) 2001-2007 Apple Inc. All Rights Reserved.
+//
 
-#include "iTunesVisualAPI.hpp"
+//########################################
+//	includes
+//########################################
+
+#include "iTunesVisualAPI.h"
 #include "iTunesPluginUtils.hpp"
-
-#include "foobar2000.h"
-#include "component.h"
-
 #include "dbgUtils.hpp"
-#include "gdUtils.hpp"
-#include "xmlLog.hpp"
-#include "httpUploader.hpp"
 
-#include "Resource.k"
-
-#define _WIN32_IE 0x301
-
-#include <tchar.h>
 #include <commctrl.h>
 
-#define kPluginName		"Siggen"
-#define	kPluginCreator	'Tnto'
+#if TARGET_OS_WIN32
+#define	MAIN iTunesPluginMain
+#define IMPEXP	__declspec(dllexport)
+#else
+#define IMPEXP
+#define	MAIN main
+#endif
 
-#define	kPluginMajorVersion		1
-#define	kPluginMinorVersion		0
-#define	kPluginReleaseStage		0x80
-#define	kPluginNonFinalRelease	0
+//########################################
+//	typedef's, struct's, enum's, etc.
+//########################################
 
-
-LRESULT CALLBACK WndProc(
-                         HWND wnd,
-                         UINT message,
-                         WPARAM wParam,
-                         LPARAM lParam
-                         )
+enum
 {
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    kColorSettingID = 3, 
+    kOKSettingID = 5
+};
 
-    switch(message)
+struct VisualPluginData {
+    void *				appCookie;
+    ITAppProcPtr			appProc;
+
+#if TARGET_OS_MAC
+    CGrafPtr			destPort;
+#else
+    HWND				destPort;
+#endif
+    Rect				destRect;
+    OptionBits			destOptions;
+    UInt32				destBitDepth;
+
+    RenderVisualData		renderData;
+    UInt32				renderTimeStampID;
+
+    ITTrackInfo			trackInfo;
+    ITStreamInfo			streamInfo;
+
+    Boolean				playing;
+    Boolean				padding[3];
+
+    //	Plugin-specific data
+    UInt8				minLevel[kVisualMaxDataChannels];		// 0-128
+    UInt8				maxLevel[kVisualMaxDataChannels];		// 0-128
+
+    UInt8				min, max;
+};
+typedef struct VisualPluginData VisualPluginData;
+
+//########################################
+//	local ( static ) globals
+//########################################
+
+static Boolean	gColorFlag = TRUE;
+
+
+
+//########################################
+// ProcessRenderData
+//########################################
+
+static void ProcessRenderData( VisualPluginData *visualPluginDataPtr, const RenderVisualData *renderData )
+{
+    SInt16		index;
+    SInt32		channel;
+
+    if (renderData == nil)
     {
-
-    case WM_CREATE:
-        {
-        }
-        break;
-
-    case WM_DESTROY:
-        {
-            ::PostQuitMessage(0);
-        }
-        break;
-
-    case 0x4337:
-        {
-            ::DestroyWindow(wnd);
-        }
-        break;
-
-    default:
-        {
-            return ::DefWindowProc(wnd, message, wParam, lParam);
-        }
-        break;
+        ZeroMemory(&visualPluginDataPtr->renderData,sizeof(visualPluginDataPtr->renderData));
+        return;
     }
 
-    return 0;
+    visualPluginDataPtr->renderData = *renderData;
+
+    for (channel = 0;channel < renderData->numSpectrumChannels;channel++)
+    {
+        visualPluginDataPtr->minLevel[channel] = 
+            visualPluginDataPtr->maxLevel[channel] = 
+            renderData->spectrumData[channel][0];
+
+        for (index = 1; index < kVisualNumSpectrumEntries; index++)
+        {
+            UInt8		value;
+
+            value = renderData->spectrumData[channel][index];
+
+            if (value < visualPluginDataPtr->minLevel[channel])
+                visualPluginDataPtr->minLevel[channel] = value;
+            else if (value > visualPluginDataPtr->maxLevel[channel])
+                visualPluginDataPtr->maxLevel[channel] = value;
+        }
+    }
 }
 
 
+//########################################
+//	RenderVisualPort
+//########################################
 
-INT WINAPI SheetProc(HWND UNUSED(dlg), UINT message, LPARAM lParam)
+static void RenderVisualPort(VisualPluginData *visualPluginData, GRAPHICS_DEVICE destPort,const Rect *destRect,Boolean onlyUpdate)
 {
-    switch(message)
-    {
-    case PSCB_PRECREATE:
-        {
-            LPDLGTEMPLATE  lpTemplate = (LPDLGTEMPLATE)lParam;
 
-            if(!(lpTemplate->style & WS_SYSMENU))
+    (void) visualPluginData;
+    (void) onlyUpdate;
+
+    if (destPort == nil)
+        return;
+
+#if TARGET_OS_MAC	
+    {	
+        GrafPtr		oldPort;
+        GDHandle	oldDevice;
+        Rect		srcRect;
+        RGBColor	foreColor;
+
+        srcRect		= *destRect;
+
+        GetGWorld(&oldPort, &oldDevice);
+        SetGWorld(destPort, nil);
+
+        foreColor.blue = ((UInt16)visualPluginData->maxLevel[0] << 9);
+        if (gColorFlag)
+            foreColor.red = foreColor.green = ((UInt16)visualPluginData->maxLevel[1] << 9);
+        else
+            foreColor.red = foreColor.green = foreColor.blue;
+
+        RGBForeColor(&foreColor);
+        PaintRect(destRect);
+
+        SetGWorld(oldPort, oldDevice);
+    }
+#else
+    {
+        RECT	srcRect;
+        HBRUSH	hBrush;
+        HDC		hdc;
+
+        srcRect.left = destRect->left;
+        srcRect.top = destRect->top;
+        srcRect.right = destRect->right;
+        srcRect.bottom = destRect->bottom;
+
+        hdc = GetDC(destPort);		
+        if (gColorFlag)
+            hBrush = CreateSolidBrush(RGB((UInt16)visualPluginData->maxLevel[1]<<1, (UInt16)visualPluginData->maxLevel[1]<<1, (UInt16)visualPluginData->maxLevel[0]<<1));
+        else
+            hBrush = CreateSolidBrush(RGB((UInt16)visualPluginData->maxLevel[1]<<1, (UInt16)visualPluginData->maxLevel[1]<<1, (UInt16)visualPluginData->maxLevel[1]<<1));
+        FillRect(hdc, &srcRect, hBrush);
+        DeleteObject(hBrush);
+        ReleaseDC(destPort, hdc);
+    }
+#endif
+}
+
+
+// ChangeVisualPort
+//
+static OSStatus ChangeVisualPort(VisualPluginData *visualPluginData,GRAPHICS_DEVICE destPort,const Rect *destRect)
+{
+    OSStatus		status;
+
+    status = noErr;
+
+    visualPluginData->destPort = destPort;
+    if (destRect != nil)
+        visualPluginData->destRect = *destRect;
+
+    return status;
+}
+
+/*
+ResetRenderData
+*/
+static void ResetRenderData(VisualPluginData *visualPluginData)
+{
+    ZeroMemory(&visualPluginData->renderData,sizeof(visualPluginData->renderData));
+
+    visualPluginData->minLevel[0] = 
+        visualPluginData->minLevel[1] =
+        visualPluginData->maxLevel[0] =
+        visualPluginData->maxLevel[1] = 0;
+}
+
+#if TARGET_OS_MAC
+/* 
+settingsControlHandler
+*/
+pascal OSStatus settingsControlHandler(EventHandlerCallRef inRef,EventRef inEvent, void* userData)
+{
+    WindowRef wind=NULL;
+    ControlID controlID;
+    ControlRef control=NULL;
+    //get control hit by event
+    GetEventParameter(inEvent,kEventParamDirectObject,typeControlRef,NULL,sizeof(ControlRef),NULL,&control);
+    wind=GetControlOwner(control);
+    GetControlID(control,&controlID);
+    switch(controlID.id){
+case kColorSettingID:
+    gColorFlag=GetControlValue(control);
+    break;
+case kOKSettingID:
+    HideWindow(wind);
+    break;
+    }
+    return noErr;
+}
+#endif
+
+
+std::string getFont(const std::string & folder)
+{
+    WIN32_FIND_DATAA wfd;
+    DWORD dwError;
+    HANDLE hFind = FindFirstFileA(folder.c_str(), &wfd);
+
+    std::vector<std::string> xx;
+    int counter = 0;
+
+    if (hFind == INVALID_HANDLE_VALUE) 
+    {
+    } 
+    else 
+    {
+        do 
+        {
+            std::string xxx = wfd.cFileName;
+            if(xxx.length() > 4)
             {
-                lpTemplate->style |= WS_SYSMENU;
+                std::string subby = xxx.substr(xxx.length() - 4);
+                if(subby == ".ttf")
+                {
+                    BOOST_LOGL(app, info) << __FUNCTION__
+                        << ": " << ("C:\\" + std::string(wfd.cFileName)).c_str();
+
+                    xx.push_back("C:\\" + std::string(wfd.cFileName));
+                    counter++;
+                }
             }
-        }
-        break;
+        } 
+        while(FindNextFileA(hFind, &wfd) != 0);
 
-    case PSCB_INITIALIZED:
-        break;
+        dwError = GetLastError();
+        FindClose(hFind);
 
-    }
-
-    return 1;
-}
-
-
-
-BOOL CALLBACK DlgSubOne(HWND dlg, UINT message, WPARAM UNUSED(wParam), LPARAM lParam)
-{
-    switch(message)
-    {
-
-    case WM_COMMAND:
-
-        PropSheet_Changed(GetParent(dlg), dlg);
-        break;
-
-    case WM_NOTIFY:
-
-        switch(LPNMHDR(lParam)->code)
+        if (dwError != ERROR_NO_MORE_FILES) 
         {
-        default:
-            break;
-        }
-        break;
-
-    default:
-        break;
-    }
-
-    return FALSE;
-}
-
-BOOL CALLBACK DlgSubTwo(HWND dlg, UINT message, WPARAM UNUSED(wParam), LPARAM lParam)
-{
-    switch(message)
-    {
-
-    case WM_COMMAND:
-
-        PropSheet_Changed(GetParent(dlg), dlg);
-        break;
-
-    case WM_NOTIFY:
-
-        switch(LPNMHDR(lParam)->code)
-        {
-        default:
-            break;
-        }
-        break;
-
-    default:
-        break;
-    }
-
-    return FALSE;
-}
-
-
-
-
-BOOL CALLBACK DlgSubThree(HWND dlg, UINT message, WPARAM UNUSED(wParam), LPARAM lParam)
-{
-    switch(message)
-    {
-
-    case WM_COMMAND:
-
-        PropSheet_Changed(GetParent(dlg), dlg);
-        break;
-
-    case WM_NOTIFY:
-
-        switch(LPNMHDR(lParam)->code)
-        {
-        default:
-            break;
-        }
-        break;
-
-    default:
-        break;
-    }
-
-    return FALSE;
-}
-
-
-DWORD WINAPI ThreadProc(LPVOID t)
-{
-    BOOST_LOGL(app, info) << __FUNCTION__;
-
-
-    PROPSHEETHEADER	m_PropSheet = {0};
-    PROPSHEETPAGE m_psp[3] = {0};
-
-    m_psp[0].dwSize     = sizeof(PROPSHEETPAGE);
-    m_psp[0].dwFlags    = PSP_USETITLE;
-    m_psp[0].hInstance  = ::GetModuleHandle(_T("Itunesplugin.dll"));
-    m_psp[0].pszTemplate = MAKEINTRESOURCE(IDD_DIALOG_SUBONE);
-    m_psp[0].pszTitle   = _T("File Settings");
-    m_psp[1].pfnDlgProc = &DlgSubOne;
-
-    m_psp[1].dwSize     = sizeof(PROPSHEETPAGE);
-    m_psp[1].dwFlags    = PSP_USETITLE;
-    m_psp[1].hInstance  = ::GetModuleHandle(_T("Itunesplugin.dll"));
-    m_psp[1].pszTemplate = MAKEINTRESOURCE(IDD_DIALOG_SUBTWO);
-    m_psp[1].pszTitle   = _T("Internet Settings");
-    m_psp[1].pfnDlgProc = &DlgSubTwo;
-
-    m_psp[2].dwSize     = sizeof(PROPSHEETPAGE);
-    m_psp[2].dwFlags    = PSP_USETITLE;
-    m_psp[2].hInstance  = ::GetModuleHandle(_T("Itunesplugin.dll"));
-    m_psp[2].pszTemplate = MAKEINTRESOURCE(IDD_DIALOG_SUBTHREE);
-    m_psp[2].pszTitle   = _T("Image Settings");
-    m_psp[2].pfnDlgProc = &DlgSubThree;
-
-    m_PropSheet.dwSize      = sizeof(PROPSHEETHEADER);
-    m_PropSheet.dwFlags     = PSH_PROPSHEETPAGE | PSH_USECALLBACK | PSH_MODELESS;
-    m_PropSheet.hInstance   = ::GetModuleHandle(_T("Itunesplugin.dll"));
-    m_PropSheet.pszCaption  = _T("Cell Properties");
-    m_PropSheet.nPages      = sizeof(m_psp) / sizeof(m_psp[0]);
-    m_PropSheet.nStartPage  = 0;
-    m_PropSheet.ppsp        = m_psp;
-    m_PropSheet.pfnCallback = &SheetProc;
-
-    HWND properties = reinterpret_cast<HWND>(PropertySheet(&m_PropSheet));
-
-    BOOST_LOG(app) << properties;
-
-    //::SetWindowLongPtr(wnd, GWLP_USERDATA, LONG_PTR(t));
-    //::ShowWindow(wnd, SW_SHOW);
-    //((VisualPluginData *) t)->dialog = wnd;
-
-    MSG msg;
-
-    while(::GetMessage(&msg, 0, 0, 0) > 0)
-    {
-        if(!::SendMessage(properties, PSM_ISDIALOGMESSAGE, 0, LPARAM(&msg)))
-        {
-            ::TranslateMessage(&msg);
-            ::DispatchMessage(&msg);
-        }
-
-        if(properties && !::SendMessage(properties, PSM_GETCURRENTPAGEHWND, 0, 0))
-        {
-            BOOST_LOG(app) << "Destroyableed";
-
-            ::DestroyWindow(properties);
-            properties = 0;
         }
     }
 
-    VisualPluginHandler(0x4337, 0, t);
+    std::string ss;
 
-    return 0;
+    if(counter)
+        ss =  xx[rand() % counter];
+
+    BOOST_LOGL(app, info) << __FUNCTION__
+        << ": " << ss.c_str();
+
+    return ss;
 }
 
+
+/*
+VisualPluginHandler
+*/
 
 static OSStatus VisualPluginHandler(
-                                    OSType message,
-                                    VisualPluginMessageInfo * messageInfo,
+                                    OSType message, 
+                                    VisualPluginMessageInfo * messageInfo, 
                                     void * refCon
                                     )
 {
-    OSStatus            status  = noErr;
-    VisualPluginData *  vpd     = static_cast<VisualPluginData *>(refCon);
+    OSStatus			status;
+    VisualPluginDataz *  vpd     = static_cast<VisualPluginDataz *>(refCon);
 
+    status = noErr;
 
     switch (message)
-    {
+    {    
 
     case 0x4337:
         {
             BOOST_LOGL(app, info) << __FUNCTION__
-                << ": Killin' Threadz";
+                << ": 0x4337";
 
             CloseHandle(vpd->p);
         }
         break;
 
-    case kVisualPluginSetWindowMessage:
-    case kVisualPluginUpdateMessage:
-    case kVisualPluginEnableMessage:
-    case kVisualPluginDisableMessage:
-    case kVisualPluginIdleMessage:
-    case kVisualPluginSetPositionMessage:
-        break;
-
-    case kVisualPluginShowWindowMessage:
-        {
-            BOOST_LOGL(app, info) << __FUNCTION__
-                << ": Show Window";
-
-
-            memcpy(&vpd->r, &messageInfo->u.showWindowMessage.drawRect, sizeof(Rect));
-            vpd->itunes = messageInfo->u.showWindowMessage.window;
-
-            /*
-
-            HWND dlg = CreateDialogParam(
-            GetModuleHandle(TEXT("Itunesplugin.dll")),
-            MAKEINTRESOURCE(IDD_DIALOG),
-            0, &DlgProc, LPARAM(vpd));
-
-            */
-        }
-        break;
-
-    case kVisualPluginHideWindowMessage:
-        {
-            BOOST_LOGL(app, info) << __FUNCTION__
-                << ": Hide Window";
-
-            memset(&vpd->r, 0, sizeof(Rect));
-            vpd->itunes = 0;
-        }
-        break;
-
-    case kVisualPluginRenderMessage:
-        {
-            HDC dc = ::GetDC(vpd->itunes);
-            RECT r;
-
-            r.bottom = vpd->r.bottom;
-            r.left = vpd->r.left;
-            r.right = vpd->r.right;
-            r.top = vpd->r.top;
-
-            ::FillRect(dc, &r, (HBRUSH) ::GetStockObject(DKGRAY_BRUSH));
-            ::ReleaseDC(vpd->itunes, dc);
-        }
-        break;
-
-    case kVisualPluginConfigureMessage:
-        {
-            BOOST_LOGL(app, info) << __FUNCTION__
-                << ": Configure";
-
-            vpd->p = CreateThread(0, 0, &ThreadProc, LPVOID(vpd), 0, &vpd->tid);
-        }
-        break;
-
+        /*
+        Sent when the visual plugin is registered.  The plugin should do minimal
+        memory allocations here.  The resource fork of the plugin is still available.
+        */		
     case kVisualPluginInitMessage:
         {
             BOOST_LOGL(app, info) << __FUNCTION__
-                << ": Initialization";
+                << ": Init";
 
             INITCOMMONCONTROLSEX icx;
 
@@ -353,13 +368,10 @@ static OSStatus VisualPluginHandler(
                 ::MessageBox(HWND_DESKTOP, TEXT("Xerces XML API failed to initialize"),
                     TEXT("Fatal Error"), MB_OK | MB_ICONEXCLAMATION);
 
-                BOOST_LOGL(app, fatal) << __FUNCTION__
-                    << ": Xerces Initialization Error - " << SX(e.getMessage());
-
                 status = unimpErr;
             }
 
-            vpd = new VisualPluginData(TEXT("C:/test.xml"), TEXT("C:/img.jpg"), TEXT("C:/log.dtd"), TEXT("C:/errors.log"));
+            vpd = new VisualPluginDataz(TEXT("C:/testestubertest.xml"), TEXT("C:/img.jpg"), TEXT("C:/log.dtd"), TEXT("C:/errors.log"));
 
             vpd->cookie	= messageInfo->u.initMessage.appCookie;
             vpd->proc = messageInfo->u.initMessage.appProc;
@@ -372,7 +384,9 @@ static OSStatus VisualPluginHandler(
         }
         break;
 
-
+        /*
+        Sent when the visual plugin is unloaded
+        */		
     case kVisualPluginCleanupMessage:
         {
             BOOST_LOGL(app, info) << __FUNCTION__
@@ -384,48 +398,112 @@ static OSStatus VisualPluginHandler(
         }
         break;
 
+        /*
+        Sent when the visual plugin is enabled.  iTunes currently enables all
+        loaded visual plugins.  The plugin should not do anything here.
+        */
+    case kVisualPluginEnableMessage:
+    case kVisualPluginDisableMessage:
+        break;
 
+        /*
+        Sent if the plugin requests idle messages.  Do this by setting the kVisualWantsIdleMessages
+        option in the RegisterVisualMessage.options field.
+        */
+    case kVisualPluginIdleMessage:
+        break;
 
-    case kVisualPluginChangeTrackMessage:
+        /*
+        Sent if the plugin requests the ability for the user to configure it.  Do this by setting
+        the kVisualWantsConfigure option in the RegisterVisualMessage.options field.
+        */
+#if TARGET_OS_MAC					
+    case kVisualPluginConfigureMessage:
         {
-            BOOST_LOGL(app, info) << __FUNCTION__ << ": Change Track";
+            static EventTypeSpec controlEvent={kEventClassControl,kEventControlHit};
+            static const ControlID kColorSettingControlID={'cbox',kColorSettingID};
 
-            vpd->trackInfo = *messageInfo->u.changeTrackMessage.trackInfo;
-            vpd->streamInfo = *messageInfo->u.changeTrackMessage.streamInfo;
+            static WindowRef settingsDialog;
+            static ControlRef color=NULL;
 
-            vpd->trackUniInfo = *messageInfo->u.changeTrackMessage.trackInfoUnicode;
-            vpd->streamUniInfo = *messageInfo->u.changeTrackMessage.streamInfoUnicode;
+            IBNibRef 		nibRef;
+            //we have to find our bundle to load the nib inside of it
+            CFBundleRef iTunesPlugin;
 
-            vpd->playing = true;
-
-            try
+            iTunesPlugin=CFBundleGetBundleWithIdentifier(CFSTR("com.apple.example.iTunes Visualizer"));
+            if (iTunesPlugin == NULL) 
             {
-                vpd->loggy->log(vpd->trackUniInfo);
-
-                vpd->ic.createLastPlayedChart(
-                    vpd->loggy->lastPlayedSongs(1), 
-                    vpd->img_file, 
-                    "C:/the_King__26_Queen_font.ttf",
-                    18);
-
-                #if defined(_UNICODE)
-                    if(!vpd->up.uploadFile(SX(vpd->img_file.c_str())))
-#else
-                if(!vpd->up.uploadFile(vpd->img_file.c_str()))
-#endif
-                {
-                    BOOST_LOGL(app, err) << "Upload failed";
-                }
-
-                vpd->loggy->serialize(vpd->music_log_file);
+                SysBeep(2);
             }
-            catch(DOMException &)
+            else
             {
-                BOOST_LOGL(app, info) << "DOM Exception";
+                CreateNibReferenceWithCFBundle(iTunesPlugin,CFSTR("SettingsDialog"), &nibRef);
+
+                if (nibRef != nil)
+                {
+                    CreateWindowFromNib(nibRef, CFSTR("PluginSettings"), &settingsDialog);
+                    DisposeNibReference(nibRef);
+
+                    if (settingsDialog)
+                    {
+                        InstallWindowEventHandler(settingsDialog,NewEventHandlerUPP(settingsControlHandler),
+                            1,&controlEvent,0,NULL);
+                        GetControlByID(settingsDialog,&kColorSettingControlID,&color);
+
+                        SetControlValue(color,gColorFlag);
+                        ShowWindow(settingsDialog);
+                    }
+                }
             }
         }
         break;
+#endif // TARGET_OS_MAC
 
+        /*
+        Sent when iTunes is going to show the visual plugin in a port.  At
+        this point,the plugin should allocate any large buffers it needs.
+        */
+    case kVisualPluginShowWindowMessage:
+        break;
+
+        /*
+        Sent when iTunes is no longer displayed.
+        */
+    case kVisualPluginHideWindowMessage:
+        break;
+
+        /*
+        Sent when iTunes needs to change the port or rectangle of the currently
+        displayed visual.
+        */
+    case kVisualPluginSetWindowMessage:
+        break;
+
+        /*
+        Sent for the visual plugin to render a frame.
+        */
+    case kVisualPluginRenderMessage:
+        break;
+#if 0			
+        /*
+        Sent for the visual plugin to render directly into a port.  Not necessary for normal
+        visual plugins.
+        */
+    case kVisualPluginRenderToPortMessage:
+        status = unimpErr;
+        break;
+#endif 0
+        /*
+        Sent in response to an update event.  The visual plugin should update
+        into its remembered port.  This will only be sent if the plugin has been
+        previously given a ShowWindow message.
+        */	
+    case kVisualPluginUpdateMessage:
+        break;
+
+        /*
+        Sent when the player starts.
+        */
     case kVisualPluginPlayMessage:
         {
             BOOST_LOGL(app, info) << __FUNCTION__ << ": Play Song";
@@ -445,14 +523,15 @@ static OSStatus VisualPluginHandler(
                 vpd->ic.createLastPlayedChart(
                     vpd->loggy->lastPlayedSongs(1), 
                     vpd->img_file, 
-                    "C:/the_King__26_Queen_font.ttf",
-                    18);
+                    getFont("C:\\*"),
+                    72);
 
-                #if defined(_UNICODE)
-                    if(!vpd->up.uploadFile(SX(vpd->img_file.c_str())))
-                #else
-                    if(!vpd->up.uploadFile(vpd->img_file.c_str()))
-                #endif
+#if defined(_UNICODE)
+                if(!vpd->up.uploadFile(SX(vpd->img_file.c_str())))
+#else
+                if(!vpd->up.uploadFile(vpd->img_file.c_str()))
+#endif
+
                 {
                     BOOST_LOGL(app, err) << "Upload failed";
                 }
@@ -473,25 +552,117 @@ static OSStatus VisualPluginHandler(
         }
         break;
 
-
-    default:
+        /*
+        Sent when the player changes the current track information.  This
+        is used when the information about a track changes,or when the CD
+        moves onto the next track.  The visual plugin should update any displayed
+        information about the currently playing song.
+        */
+    case kVisualPluginChangeTrackMessage:
         {
-            status = unimpErr;
+            BOOST_LOGL(app, info) << __FUNCTION__ << ": Change Track";
+
+            vpd->trackInfo = *messageInfo->u.changeTrackMessage.trackInfo;
+            vpd->streamInfo = *messageInfo->u.changeTrackMessage.streamInfo;
+
+            vpd->trackUniInfo = *messageInfo->u.changeTrackMessage.trackInfoUnicode;
+            vpd->streamUniInfo = *messageInfo->u.changeTrackMessage.streamInfoUnicode;
+
+            vpd->playing = true;
+
+            try
+            {
+                vpd->loggy->log(vpd->trackUniInfo);
+
+                vpd->ic.createLastPlayedChart(
+                    vpd->loggy->lastPlayedSongs(1), 
+                    vpd->img_file, 
+                    getFont("C:\\*"),
+                    72);
+
+#if defined(_UNICODE)
+                if(!vpd->up.uploadFile(SX(vpd->img_file.c_str())))
+#else
+                if(!vpd->up.uploadFile(vpd->img_file.c_str()))
+#endif
+
+                {
+                    BOOST_LOGL(app, err) << "Upload failed";
+                }
+
+                vpd->loggy->serialize(vpd->music_log_file);
+            }
+            catch(DOMException &)
+            {
+                BOOST_LOGL(app, info) << "DOM Exception";
+            }
         }
         break;
-    }
 
-    return status;
+        /*
+        Sent when the player stops.
+        */
+    case kVisualPluginStopMessage:
+        break;
+
+        /*
+        Sent when the player changes position.
+        */
+    case kVisualPluginSetPositionMessage:
+        break;
+
+
+        /*
+        Sent to the plugin in response to a MacOS event.  The plugin should return noErr
+        for any event it handles completely,or an error (unimpErr) if iTunes should handle it.
+        */
+#if TARGET_OS_MAC
+    case kVisualPluginEventMessage:
+        {
+            EventRecord* tEventPtr = messageInfo->u.eventMessage.event;
+            if ((tEventPtr->what == keyDown) || (tEventPtr->what == autoKey))
+            {    // charCodeMask,keyCodeMask;
+                char theChar = tEventPtr->message & charCodeMask;
+
+                switch (theChar)
+                {
+                case	'c':
+                case	'C':
+                    gColorFlag = !gColorFlag;
+                    status = noErr;
+                    break;
+
+                default:
+                    status = unimpErr;
+                    break;
+                }
+            }
+            else
+                status = unimpErr;
+        }
+        break;
+#endif // TARGET_OS_MAC
+
+    default:
+        status = unimpErr;
+        break;
+    }
+    return status;	
 }
 
+/*
+RegisterVisualPlugin
+*/
 
-//
-// Registration of plug-in
-//
+enum
+{
+    kPluginMajorVersion = 1,
+    kPluginMinorVersion = 1,
+    kPluginReleaseStage = 1,
+    kPluginNonFinalRelease = 2
+};
 
-static OSStatus RegisterPlugin(
-                               PluginMessageInfo * messageInfo
-                               )
+static OSStatus RegisterVisualPlugin(PluginMessageInfo *messageInfo)
 {
     BOOST_LOGL(app, info) << __FUNCTION__;
 
@@ -511,11 +682,11 @@ static OSStatus RegisterPlugin(
     //
 
     playerMessageInfo.u.registerVisualPluginMessage.options
-        = kVisualWantsIdleMessages | kVisualWantsConfigure; // Notifcations
+        = kVisualWantsIdleMessages | kVisualWantsConfigure;
     playerMessageInfo.u.registerVisualPluginMessage.handler
         = &VisualPluginHandler; // Message handler callback
     playerMessageInfo.u.registerVisualPluginMessage.creator
-        = kPluginCreator;
+        = 'Tnto';
 
     playerMessageInfo.u.registerVisualPluginMessage.timeBetweenDataInMS		= 0xFFFFFFFF;
     playerMessageInfo.u.registerVisualPluginMessage.numWaveformChannels		= 2;
@@ -537,10 +708,9 @@ static OSStatus RegisterPlugin(
     //
 
     playerMessageInfo.u.registerVisualPluginMessage.name[0] =
-        static_cast<UInt8>(strlen(kPluginName));
+        static_cast<UInt8>(strlen("Habit"));
 
-    std::copy(kPluginName, kPluginName + strlen(kPluginName),
-        &playerMessageInfo.u.registerVisualPluginMessage.name[1]);
+    strcpy(reinterpret_cast<char *>(&playerMessageInfo.u.registerVisualPluginMessage.name[1]), "Habit");
 
     //
     // Register it
@@ -550,196 +720,31 @@ static OSStatus RegisterPlugin(
         messageInfo->u.initMessage.appProc, &playerMessageInfo);
 }
 
+//########################################
+//	main entrypoint
+//########################################
 
-extern "C" __declspec(dllexport) BOOL WINAPI DllMain(
-    HINSTANCE /* instance */,
-    DWORD reason,
-    LPVOID /* reserved */
-    )
-{
-    switch(reason)
-    {
-        case DLL_PROCESS_ATTACH:
-            break;
-
-        case DLL_THREAD_ATTACH:
-            break;
-
-        case DLL_THREAD_DETACH:
-            break;
-
-        case DLL_PROCESS_DETACH:
-            break;
-    }
-
-    return TRUE;
-}
-
-
-//
-// Entry point for the app
-//
-
-
-
-static HINSTANCE g_hIns;
-
-static pfc::string_simple g_name, g_full_path;
-
-static bool g_services_available = false, g_initialized = false;
-
-static foobar2000_api * g_api;
-
-namespace core_api
+extern "C"
 {
 
-	HINSTANCE get_my_instance()
-	{
-		return g_hIns;
-	}
-
-	HWND get_main_window()
-	{
-		return g_api->get_main_window();
-	}
-
-	pcchar get_my_file_name()
-	{
-		return g_name;
-	}
-
-	pcchar get_my_full_path()
-	{
-		return g_full_path;
-	}
-
-	bool are_services_available()
-	{
-		return g_services_available;
-	}
-	bool assert_main_thread()
-	{
-		return (g_services_available && g_api) ? 
-            g_api->assert_main_thread() : true;
-	}
-
-	void ensure_main_thread() 
-    {
-		if (!assert_main_thread()) 
-            throw exception_wrong_thread();
-	}
-
-	bool is_main_thread()
-	{
-		return (g_services_available && g_api) ? 
-            g_api->is_main_thread() : true;
-	}
-
-	pcchar get_profile_path()
-	{
-		return (g_services_available && g_api) ? 
-            g_api->get_profile_path() : 0;
-	}
-
-	bool is_shutting_down()
-	{
-		return (g_services_available && g_api) ? 
-            g_api->is_shutting_down() : g_initialized;
-	}
-	bool is_initializing()
-	{
-		return (g_services_available && g_api) ? 
-            g_api->is_initializing() : !g_initialized;
-	}
-}
-
-namespace 
-{
-	class foobar2000_client_impl : 
-        public foobar2000_client
-	{
-
-	public:
-
-		t_uint32 get_version() 
-        {
-            return FOOBAR2000_CLIENT_VERSION;
-        }
-
-		pservice_factory_base get_service_list() 
-        {
-            return service_factory_base::__internal__list;
-        }
-
-		void get_config(stream_writer * p_stream, abort_callback & p_abort) 
-        {
-			cfg_var::config_write_file(p_stream, p_abort);
-		}
-
-		void set_config(stream_reader * p_stream, abort_callback & p_abort) 
-        {
-			cfg_var::config_read_file(p_stream, p_abort);
-		}
-
-		void set_library_path(const char * path, const char * name) 
-        {
-			g_full_path = path;
-			g_name = name;
-		}
-
-		void services_init(bool val) 
-        {
-            ::MessageBox(0, L"h", 0, 0);
-
-			if (val) 
-                g_initialized = true;
-
-			g_services_available = val;
-		}
-
-		bool is_debug() 
-        {
-#ifdef _DEBUG
-			return true;
+#if TARGET_OS_WIN32
+    IMPEXP OSStatus MAIN
+        (OSType message, PluginMessageInfo * messageInfo, void * refCon)
 #else
-			return false;
+    OSStatus iTunesPluginMainMachO
+        (OSType message, PluginMessageInfo * messageInfo, void * refCon)
 #endif
-		}
-	};
-}
 
-static foobar2000_client_impl g_client;
-
-extern "C"
-{
-	__declspec(dllexport) foobar2000_client * _cdecl foobar2000_get_interface(foobar2000_api * p_api, HINSTANCE hIns)
-	{
-            ::MessageBox(0, L"h", 0, 0);
-
-		g_hIns = hIns;
-		g_api = p_api;
-
-		return &g_client;
-	}
-}
-
-
-
-extern "C"
-{
-    __declspec(dllexport) OSStatus iTunesPluginMain
-        (
-        OSType message,
-        PluginMessageInfo * messageInfo,
-        void * /* refCon */
-        )
     {
-        OSStatus status = noErr;
+        OSStatus		status;
+
+        (void) refCon;
+
+        BOOST_LOGL(app, info) << __FUNCTION__;
 
         switch (message)
         {
-
-        case kPluginluginInitMessage:
+        case kPluginInitMessage:
             {
                 using namespace boost::logging;
 
@@ -751,32 +756,17 @@ extern "C"
 
                 normalizeCurrentDirectory();
                 srand(seed());
-
-                BOOST_LOGL(app, info) << __FUNCTION__ << ": kPlugluginInitMessage";
-                status = RegisterPlugin(messageInfo);
+                status = RegisterVisualPlugin(messageInfo);
             }
             break;
 
-        case kPluginluginCleanupMessage:
-            {
-                BOOST_LOGL(app, info) << __FUNCTION__ << ": kPluginluginCleanupMessage";
-                status = noErr;
-            }
-            break;
-
-        case kPluginlayerRegisterVisualPluginMessage:
-            {
-                BOOST_LOGL(app, info) << __FUNCTION__ << ": kPluginlayerRegisterVisualPluginMessage";
-                status = noErr;
-            }
+        case kPluginCleanupMessage:
+            status = noErr;
             break;
 
         default:
-            {
-                status = unimpErr;
-            }
+            status = unimpErr;
             break;
-
         }
 
         return status;
