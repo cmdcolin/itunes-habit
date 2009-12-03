@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8.00"
+	Version="9.00"
 	Name="Itunesplugin"
 	ProjectGUID="{97724FCF-8681-46FC-A235-09D060835CA0}"
 	RootNamespace="Itunesplugin"
+	TargetFrameworkVersion="131072"
 	>
 	<Platforms>
 		<Platform
@@ -40,7 +41,7 @@
 				Name="VCCLCompilerTool"
 				AdditionalOptions="/GL&#x0D;&#x0A;&#x0D;&#x0A;"
 				Optimization="0"
-				AdditionalIncludeDirectories="C:\Bin\Foobarsdk\foobar2000\SDK;C:\Bin\Xerces\src;C:\Bin\Boost;&quot;C:\Bin\Libcurl\curl-7.13.1\include&quot;;C:\Bin\Libgd\include"
+				AdditionalIncludeDirectories="&quot;C:\Hell\xerces-c-src_2_8_0\src&quot;;C:\Hell\boost_1_40_0;&quot;C:\Hell\curl-7.19.4\include&quot;;C:\Hell\Libgd\include"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;PROJ_R, _DEBUG, WIN32, PLATFORM_WIN32, BOOST_LOG_NO_LIB"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="0"
@@ -61,10 +62,12 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libcurl.lib C:\Bin\Foobarsdk\pfc\Debug\pfc.lib C:\Bin\Foobarsdk\foobar2000\SDK\Release\foobar2000_SDK.lib C:\Bin\Foobarsdk\foobar2000\shared\shared.lib pfc.lib user32.lib kernel32.lib gdi32.lib bgd.lib xerces-c_2.lib comctl32.lib"
+				AdditionalDependencies="libcurl_imp.lib user32.lib kernel32.lib gdi32.lib bgd.lib xerces-c_2.lib comctl32.lib"
 				ShowProgress="0"
-				AdditionalLibraryDirectories="C:\Bin\Foobarsdk\pfc\Release;C:\Bin\Xerces\Build\Win32\VC7\Release;C:\Bin\Boost\stage\lib\;C:\Bin\Libgd\lib;&quot;C:\Bin\Libcurl\curl-7.13.1\lib&quot;"
+				AdditionalLibraryDirectories="&quot;C:\Hell\curl-7.19.7\lib\DLL-Release&quot;;&quot;C:\Hell\xerces-c-src_2_8_0\Build\Win32\VC8\Release&quot;;C:\Hell\boost_1_40_0\stage\lib;C:\Hell\Libgd\lib;&quot;C:\Hell\curl-7.19.4\lib&quot;"
 				GenerateDebugInformation="true"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -85,9 +88,6 @@
 			/>
 			<Tool
 				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCWebDeploymentTool"
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
@@ -118,7 +118,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="C:\Bin\Foobarsdk\foobar2000\SDK;C:\Bin\Xerces\src;C:\Bin\Boost;&quot;C:\Bin\Libcurl\curl-7.13.1\include&quot;;C:\Bin\Libgd\include"
+				AdditionalIncludeDirectories="&quot;C:\Hell\xerces-c-src_2_8_0\src&quot;;C:\Hell\boost_1_40_0;&quot;C:\Hell\curl-7.19.4\include&quot;;C:\Hell\Libgd\include"
+				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;PROJ_R, WIN32, PLATFORM_WIN32, BOOST_LOG_NO_LIB"
 				RuntimeLibrary="2"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="true"
@@ -135,11 +136,13 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libcurl.lib C:\Bin\Foobarsdk\pfc\Debug\pfc.lib C:\Bin\Foobarsdk\foobar2000\SDK\Release\foobar2000_SDK.lib C:\Bin\Foobarsdk\foobar2000\shared\shared.lib pfc.lib user32.lib kernel32.lib gdi32.lib bgd.lib xerces-c_2.lib comctl32.lib"
-				AdditionalLibraryDirectories="C:\Bin\Foobarsdk\pfc\Release;C:\Bin\Xerces\Build\Win32\VC7\Release;C:\Bin\Boost\stage\lib\;C:\Bin\Libgd\lib;&quot;C:\Bin\Libcurl\curl-7.13.1\lib&quot;"
+				AdditionalDependencies="libcurl_imp.lib user32.lib kernel32.lib gdi32.lib bgd.lib xerces-c_2.lib comctl32.lib"
+				AdditionalLibraryDirectories="&quot;C:\Hell\curl-7.19.7\lib\DLL-Release&quot;;&quot;C:\Hell\xerces-c-src_2_8_0\Build\Win32\VC8\Release&quot;;C:\Hell\boost_1_40_0\stage\lib;C:\Hell\Libgd\lib;&quot;C:\Hell\curl-7.19.4\lib&quot;"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
+				RandomizedBaseAddress="1"
+				DataExecutionPrevention="0"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -161,9 +164,6 @@
 				Name="VCAppVerifierTool"
 			/>
 			<Tool
-				Name="VCWebDeploymentTool"
-			/>
-			<Tool
 				Name="VCPostBuildEventTool"
 			/>
 		</Configuration>
@@ -181,7 +181,7 @@
 				>
 			</File>
 			<File
-				RelativePath="C:\Bin\Boost\libs\log\src\functions.cpp"
+				RelativePath="..\..\Hell\boost_1_40_0\libs\log\src\functions.cpp"
 				>
 			</File>
 			<File
@@ -203,13 +203,21 @@
 			<File
 				RelativePath=".\iTunesPluginUtils.cpp"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						AdditionalOptions="/I &quot;C:\Hell\curl-7.19.7\include&quot; \I &quot;C:\Hell\Libgd\include&quot; \I &quot;C:\Hell\boost_1_40_0&quot; \I &quot;C:\Hell\xerces-c-3.0.1\src&quot;"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="C:\Bin\Boost\libs\log\src\log.cpp"
+				RelativePath="..\..\Hell\boost_1_40_0\libs\log\src\log.cpp"
 				>
 			</File>
 			<File
-				RelativePath="C:\Bin\Boost\libs\log\src\log_manager.cpp"
+				RelativePath="..\..\Hell\boost_1_40_0\libs\log\src\log_manager.cpp"
 				>
 			</File>
 			<File
@@ -243,7 +251,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\iTunesApi.hpp"
+				RelativePath=".\iTunesAPI.h"
 				>
 			</File>
 			<File
