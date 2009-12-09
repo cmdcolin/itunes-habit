@@ -136,8 +136,8 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libcurl_imp.lib user32.lib kernel32.lib gdi32.lib bgd.lib xerces-c_2.lib comctl32.lib"
-				AdditionalLibraryDirectories="&quot;C:\Hell\curl-7.19.7\lib\DLL-Release&quot;;&quot;C:\Hell\xerces-c-src_2_8_0\Build\Win32\VC8\Release&quot;;C:\Hell\boost_1_40_0\stage\lib;C:\Hell\Libgd\lib;&quot;C:\Hell\curl-7.19.4\lib&quot;"
+				AdditionalDependencies="libcurl_imp.lib user32.lib kernel32.lib gdi32.lib bgd.lib xerces-c_2.lib comctl32.lib ws2_32.lib"
+				AdditionalLibraryDirectories="&quot;C:\Hell\xerces-c-src_2_8_0\Build\Win32\VC8\Release&quot;;C:\Hell\boost_1_40_0\stage\lib;C:\Hell\Libgd\lib;&quot;C:\Hell\curl-7.19.7\lib\DLL-Release&quot;"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
