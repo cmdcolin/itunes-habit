@@ -13,6 +13,8 @@
 #include <iomanip>
 
 #include <windows.h>
+using namespace std;
+
 
 inline unsigned int rr(
                        unsigned int start,
@@ -36,11 +38,12 @@ void Creator::createLastPlayedChart(
 {
     BOOST_LOGL(app, info) << __FUNCTION__;
 
-    int stringPlacement = 15;
     int bounds[8];
 
     std::vector<char> v(font.begin(), font.end());
     v.push_back('\0');
+
+	std::stringstream fulltext;
 
     for(std::vector<const DOMElement *>::const_iterator i = arr.begin();
         i != arr.end(); ++i)
@@ -64,46 +67,53 @@ void Creator::createLastPlayedChart(
         char sss[800];
         ::WideCharToMultiByte(CP_UTF8, 0, &m[0], (int) m.size(), sss, sizeof(sss), 0, 0);
 
-        char * e;
+fulltext << std::setfill('0') << std::setw(2) << t.wHour << ":"
+            << std::setfill('0') << std::setw(2) << t.wMinute << " ";
+		fulltext << sss << endl;
+	}
 
-/*std::setfill(L'0') << std::setw(2) << t.wHour << L":"
-            << std::setfill(L'0') << std::setw(2) << t.wMinute << L":"
-            << std::setfill(L'0') << std::setw(2) << t.wSecond << " - "
-            << */
 
-        e = gdImageStringFT(0, &bounds[0], 0, &v[0], fsize, 0.0, 0, 0, sss);
-        if(e)
-            BOOST_LOG(app) << e;
 
-        gdWimage image(bounds[2] - bounds[6] + 6, bounds[3] - bounds[7] + 6);
+	// get bounding rectangle for the text
+	std::string fulltext_str(fulltext.str());
+	std::vector<char> fulltext_cstr(fulltext_str.begin(), fulltext_str.end());
+	fulltext_cstr.push_back('\0');
 
-        unsigned int 
-            r = rr(170, 255), 
-            g = rr(170, 255), 
-            b = rr(170, 255);
+	char * err = gdImageStringFT(0, &bounds[0], 0, &v[0], fsize, 0.0, 0, 0, &fulltext_cstr[0]);
+	if(err)
+		BOOST_LOG(app) << __FUNCTION__ << "gdImageStringFT: " << err;
 
-        BOOST_LOGL(app, info) << r << " " << g << " " << b;
-        int brush = gdImageColorResolve(image.p, r, g, b);
-        int pen = gdImageColorResolve(image.p, 0, 0, 0);
+	int x = bounds[2]-bounds[6] + 6;
+	int y = bounds[3]-bounds[7] + 6;
 
-        gdImageFilledRectangle(image.p, 1, 1, image.p->sx - 2, image.p->sy - 2, brush);
-        gdImageRectangle(image.p, 0, 0, image.p->sx - 1, image.p->sy - 1, pen);
+	gdWimage image(x, y);
 
-        e = gdImageStringFT(image.p, &bounds[0], pen, &v[0], fsize, 0.0, 3 - bounds[6], 3 - bounds[7], sss);
+	unsigned int 
+		r = rr(170, 255), 
+		g = rr(170, 255), 
+		b = rr(170, 255);
 
-        if(e)
-            BOOST_LOG(app) << e;
+	int brush = gdImageColorResolve(image.p, r, g, b);
+	int pen = gdImageColorResolve(image.p, 0, 0, 0);
 
-        stringPlacement += fsize + int(fsize / 4.0);
+	gdImageFilledRectangle(image.p, 1, 1, image.p->sx - 2, image.p->sy - 2, brush);
+	gdImageRectangle(image.p, 0, 0, image.p->sx - 1, image.p->sy - 1, pen);
 
-        std::fstream o(file.c_str(), std::ios::binary | std::ios::trunc | std::ios::out);
+	x = 3 - bounds[6];
+	y = 3 - bounds[7];
 
-        int size = 0;
-        void * rawJpegData = gdImageJpegPtr(image.p, &size, -1);
+	err = gdImageStringFT(image.p, &bounds[0], pen, &v[0], fsize, 0.0, x, y, &fulltext_cstr[0]);
+	if(err)
+		BOOST_LOG(app) << __FUNCTION__ << "gdImageStringFT: " << err;
 
-        o.write(static_cast<char *>(rawJpegData), size);
-        gdFree(rawJpegData);
-    }
+	fstream o(file.c_str(), ios::binary | ios::trunc | ios::out);
+
+	int size = 0;
+	void * rawJpegData = gdImageJpegPtr(image.p, &size, -1);
+
+	o.write(static_cast<char *>(rawJpegData), size);
+
+	gdFree(rawJpegData);
 }
 
 
@@ -122,7 +132,9 @@ void Creator::createDynaLastPlayed(const std::vector<const DOMElement *> & arr, 
 
     DOMElement * items = doc->createElement(XS("items"));
 
+
     int x = 5, y = 5;
+
     for(std::vector<const DOMElement *>::const_iterator i = arr.begin();
         i != arr.end(); ++i, y += 20)
     {

@@ -532,17 +532,18 @@ static OSStatus VisualPluginHandler(
             {
                 vpd->loggy->log(vpd->trackUniInfo);
 
-                vpd->ic.createLastPlayedChart(
-                    vpd->loggy->lastPlayedSongs(1), 
+				vpd->ic.createLastPlayedChart(
+                    vpd->loggy->lastPlayedSongs(5), 
                     vpd->img_file, 
                     getFont("C:\\*"),
-                    72);
+                    24);
 
-#if defined(_UNICODE)
-                if(!vpd->up.uploadFile(SX(vpd->img_file.c_str())))
-#else
-                if(!vpd->up.uploadFile(vpd->img_file.c_str()))
-#endif
+//
+//#if defined(_UNICODE)
+//                if(!vpd->up.uploadFile(SX(vpd->img_file.c_str())))
+//#else
+//                if(!vpd->up.uploadFile(vpd->img_file.c_str()))
+//#endif
 
                 {
                     BOOST_LOGL(app, err) << "Upload failed";

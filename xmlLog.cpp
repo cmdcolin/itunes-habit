@@ -21,11 +21,10 @@ Log::Log(
 
     if(exists)
     {
+		std::auto_ptr<ErrorReporter> err(new ErrorReporter());
+
         parser.reset(new XercesDOMParser());
-
-        BOOST_LOGL(app, info) << __FUNCTION__;
-
-        parser->setErrorHandler(std::auto_ptr<ErrorReporter>(new ErrorReporter()).get());
+        parser->setErrorHandler(err.get());
         parser->setValidationScheme(XercesDOMParser::Val_Always);
         parser->setDoNamespaces(false);
         parser->setDoSchema(true);
@@ -72,7 +71,7 @@ Log::Log(
         t.c_str());
 #endif
 
-        m_doc = impl->createDocument(XS("root"), XS("log"), dtype);
+        m_doc = impl->createDocument(0, XS("log"), dtype);
 
         m_doc->setEncoding(XS("UTF-8"));
         m_release_doc = true;
@@ -170,7 +169,7 @@ void Log::log(ITTrackInfoV1 & ti)
 
 void Log::log(ITTrackInfo & ti)
 {
-    BOOST_LOGL(app, info) << __FUNCTION__ << " " << m_doc;
+    BOOST_LOGL(app, info) << __FUNCTION__;
 
     if(!m_doc)
     {
@@ -209,6 +208,8 @@ void Log::log(ITTrackInfo & ti)
     song_child = m_doc->createElement(XS("time"));
     song_child->appendChild(m_doc->createTextNode((XMLCh*) wss.str().c_str()));
     song->appendChild(song_child);
+
+	BOOST_LOGL(app, info) << wss.str().c_str();
 
     m_doc->getDocumentElement()->appendChild(song);
 }
