@@ -1,21 +1,23 @@
 #include "httpUploader.hpp"
-#include "dbgUtils.hpp"
 
+#include <iostream>
+
+using namespace std;
 
 Uploader::Uploader()
 {
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    cerr << __FUNCTION__;
 
     curl = curl_easy_init();
     if(!curl)
     {
-        BOOST_LOGL(app, err) << "Curl initialization failure";
+        cerr << "Curl initialization failure";
     }
 }
 
 Uploader::~Uploader()
 {
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    cerr << __FUNCTION__;
 
     curl_easy_cleanup(curl);
 }
@@ -37,7 +39,7 @@ void Uploader::setFormElementName(const std::string & s)
 
 int Uploader::uploadFile(const std::string & s)
 {
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    cerr << __FUNCTION__;
 
 	curl_httppost * post = 0;
 	curl_httppost * last = 0;

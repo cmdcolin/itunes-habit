@@ -106,7 +106,7 @@ public:
 
 	Filter(unsigned long s = DOMNodeFilter::SHOW_ALL);
 
-	virtual short acceptNode(const DOMNode *) const;
+	virtual FilterAction acceptNode(const DOMNode *) const;
 	virtual unsigned long getWhatToShow(void) const { return show; }
 	virtual void setWhatToShow(unsigned long s) { show = s; }
 

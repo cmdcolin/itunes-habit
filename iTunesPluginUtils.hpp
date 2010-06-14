@@ -31,7 +31,7 @@ struct
         img_file(imgfike), grammar_file(grammar)
 
     {
-        BOOST_LOGL(app, info) << __FUNCTION__;
+        cerr << __FUNCTION__;
 
         try
         {
@@ -52,17 +52,17 @@ struct
         }
         catch(XMLException & e)
         {
-            BOOST_LOG(app) << SX(e.getMessage());
+            cerr << SX(e.getMessage());
         }
         catch(DOMException & e)
         {
-            BOOST_LOG(app) << SX(e.getMessage());
+            cerr << SX(e.getMessage());
         }
     }
 
     ~VisualPluginDataz()
     {
-        BOOST_LOGL(app, info) << __FUNCTION__;
+        cerr << __FUNCTION__;
 
         delete loggy;
     }

@@ -51,7 +51,6 @@
 
 #include "iTunesVisualAPI.h"
 #include "iTunesPluginUtils.hpp"
-#include "dbgUtils.hpp"
 
 #include <commctrl.h>
 
@@ -297,7 +296,7 @@ std::string getFont(const std::string & folder)
                 std::string subby = xxx.substr(xxx.length() - 4);
                 if(subby == ".ttf")
                 {
-                    BOOST_LOGL(app, info) << __FUNCTION__
+                    cerr << __FUNCTION__
                         << ": " << ("C:\\" + std::string(wfd.cFileName)).c_str();
 
                     xx.push_back("C:\\" + std::string(wfd.cFileName));
@@ -320,7 +319,7 @@ std::string getFont(const std::string & folder)
     if(counter)
         ss =  xx[rand() % counter];
 
-    BOOST_LOGL(app, info) << __FUNCTION__
+    cerr << __FUNCTION__
         << ": " << ss.c_str();
 
     return ss;
@@ -347,7 +346,7 @@ static OSStatus VisualPluginHandler(
 
     case 0x4337:
         {
-            BOOST_LOGL(app, info) << __FUNCTION__
+            cerr << __FUNCTION__
                 << ": 0x4337";
 
             CloseHandle(vpd->p);
@@ -360,7 +359,7 @@ static OSStatus VisualPluginHandler(
         */		
     case kVisualPluginInitMessage:
         {
-            BOOST_LOGL(app, info) << __FUNCTION__
+            cerr << __FUNCTION__
                 << ": Init";
 
             INITCOMMONCONTROLSEX icx;
@@ -401,7 +400,7 @@ static OSStatus VisualPluginHandler(
         */		
     case kVisualPluginCleanupMessage:
         {
-            BOOST_LOGL(app, info) << __FUNCTION__
+            cerr << __FUNCTION__
                 << ": Cleanup";
 
             delete vpd;
@@ -518,7 +517,7 @@ static OSStatus VisualPluginHandler(
         */
     case kVisualPluginPlayMessage:
         {
-            BOOST_LOGL(app, info) << __FUNCTION__ << ": Play Song";
+            cerr << __FUNCTION__ << ": Play Song";
 
             vpd->trackInfo = *messageInfo->u.playMessage.trackInfo;
             vpd->streamInfo = *messageInfo->u.playMessage.streamInfo;
@@ -546,14 +545,14 @@ static OSStatus VisualPluginHandler(
 //#endif
 
                 {
-                    BOOST_LOGL(app, err) << "Upload failed";
+                    cerr << "Upload failed";
                 }
 
                 vpd->loggy->serialize(vpd->music_log_file);
             }
             catch(DOMException & e)
             {
-                BOOST_LOGL(app, info) << "DOM Exception: " << e.getMessage();
+                cerr << "DOM Exception: " << e.getMessage();
             }
         }
         break;
@@ -573,7 +572,7 @@ static OSStatus VisualPluginHandler(
         */
     case kVisualPluginChangeTrackMessage:
         {
-            BOOST_LOGL(app, info) << __FUNCTION__ << ": Change Track";
+            cerr << __FUNCTION__ << ": Change Track";
 
             vpd->trackInfo = *messageInfo->u.changeTrackMessage.trackInfo;
             vpd->streamInfo = *messageInfo->u.changeTrackMessage.streamInfo;
@@ -600,14 +599,14 @@ static OSStatus VisualPluginHandler(
 #endif
 
                 {
-                    BOOST_LOGL(app, err) << "Upload failed";
+                    cerr << "Upload failed";
                 }
 
                 vpd->loggy->serialize(vpd->music_log_file);
             }
             catch(DOMException &)
             {
-                BOOST_LOGL(app, info) << "DOM Exception";
+                cerr << "DOM Exception";
             }
         }
         break;
@@ -677,7 +676,7 @@ enum
 
 static OSStatus RegisterVisualPlugin(PluginMessageInfo *messageInfo)
 {
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    cerr << __FUNCTION__;
 
     PlayerMessageInfo playerMessageInfo = {0};
 
@@ -759,20 +758,12 @@ IMPEXP OSStatus MAIN(OSType message,PluginMessageInfo *messageInfo,void *refCon)
 
         (void) refCon;
 
-        BOOST_LOGL(app, info) << __FUNCTION__;
+        cerr << __FUNCTION__;
 
         switch (message)
         {
         case kPluginInitMessage:
             {
-                using namespace boost::logging;
-
-                flush_log_cache();
-                add_modifier(_T("*"), prepend_time(_T("$hh:$mm:$ss ")), _T(""), INT_MAX);
-                add_modifier(_T("*"), append_enter);
-                add_appender(_T("*"), write_to_dbg_wnd);
-                manipulate_logs(_T("*")).enable(level::enable_all);
-
                 normalizeCurrentDirectory();
                 srand(seed());
                 status = RegisterVisualPlugin(messageInfo);

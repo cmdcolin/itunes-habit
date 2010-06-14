@@ -1,19 +1,22 @@
 #include "xmlUtils.hpp"
-#include "dbgUtils.hpp"
+#include <iostream>
+
+using namespace std;
 
 #include <xercesc/sax/SAXParseException.hpp>
+
 
 void ErrorReporter::warning(const SAXParseException & e)
 {
     num_warnings++;
 
-    warnings
+    cerr
         << L"Warning at file \"" << SX(e.getSystemId())
         << L"\", line " << e.getLineNumber()
         << L", column " << e.getColumnNumber()
         << L". Message: " << SX(e.getMessage()) << std::endl;
 
-    BOOST_LOGL(app, warn)
+    cerr
         << "Warning at file \"" << SX(e.getSystemId())
         << "\", line " << e.getLineNumber()
         << ", column " << e.getColumnNumber()
@@ -24,13 +27,13 @@ void ErrorReporter::error(const SAXParseException & e)
 {
     num_errors++;
 
-    errs
+    cerr
         << L"Error at file \"" << SX(e.getSystemId())
         << L"\", line " << e.getLineNumber()
         << L", column " << e.getColumnNumber()
         << L". Message: " << SX(e.getMessage()) << std::endl;
 
-    BOOST_LOGL(app, err)
+    cerr
         << "Error at file \"" << SX(e.getSystemId())
         << "\", line " << e.getLineNumber()
         << ", column " << e.getColumnNumber()
@@ -41,13 +44,13 @@ void ErrorReporter::fatalError(const SAXParseException & e)
 {
     num_fatals++;
 
-    fatals
+    cerr
         << L"Fatal at file \"" << SX(e.getSystemId())
         << L"\", line " << e.getLineNumber()
         << L", column " << e.getColumnNumber()
         << L". Message: " << SX(e.getMessage()) << std::endl;
 
-    BOOST_LOGL(app, fatal)
+    cerr
         << "Fatal at file \"" << SX(e.getSystemId())
         << "\", line " << e.getLineNumber()
         << ", column " << e.getColumnNumber()
@@ -69,7 +72,7 @@ Filter::Filter(unsigned long s)
 {
 }
 
-short Filter::acceptNode(const DOMNode * /* node */) const
+DOMNodeFilter::FilterAction Filter::acceptNode(const DOMNode * /* node */) const
 {
 	/*
 

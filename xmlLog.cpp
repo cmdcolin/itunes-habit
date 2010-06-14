@@ -1,7 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "xmlLog.hpp"
-#include "dbgUtils.hpp"
 #include "gdUtils.hpp"
 #include "iTunesVisualAPI.h"
 
@@ -11,13 +10,16 @@
 #include <xercesc/util/OutOfMemoryException.hpp>
 #include <xercesc/framework/LocalFileFormatTarget.hpp>
 
+#include <iostream>
+
+using namespace std;
 
 Log::Log(
          const std::basic_string<TCHAR> & t,
          bool exists
          )
 {
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    cerr << __FUNCTION__;
 
     if(exists)
     {
@@ -31,7 +33,7 @@ Log::Log(
         parser->setValidationSchemaFullChecking(true);
         parser->setLoadExternalDTD(true);
 
-        BOOST_LOGL(app, info) << __FUNCTION__ << ": " << t.c_str();
+        cerr << __FUNCTION__ << ": " << t.c_str();
 
         try
         {
@@ -39,23 +41,23 @@ Log::Log(
         }
         catch(XMLException & e)
         {
-            BOOST_LOGL(app, info) << __FUNCTION__ << ": Rad - " << e.getMessage();
+            cerr << __FUNCTION__ << ": Rad - " << e.getMessage();
         }
         catch(DOMException & e)
         {
-            BOOST_LOGL(app, info) << __FUNCTION__ << ": Bad - " << e.getMessage();
+            cerr << __FUNCTION__ << ": Bad - " << e.getMessage();
         }
         catch(...)
         {
-            BOOST_LOGL(app, info) << __FUNCTION__ << ": Unknown exception";
+            cerr << __FUNCTION__ << ": Unknown exception";
         }
 
-        BOOST_LOGL(app, info) << __FUNCTION__;
+        cerr << __FUNCTION__;
 
         m_doc = parser->getDocument();
         m_release_doc = false;
 
-        BOOST_LOGL(app, info) << __FUNCTION__ << ": Log Parsed: " << m_doc;
+        cerr << __FUNCTION__ << ": Log Parsed: " << m_doc;
     }
 
     else
@@ -73,17 +75,17 @@ Log::Log(
 
         m_doc = impl->createDocument(0, XS("log"), dtype);
 
-        m_doc->setEncoding(XS("UTF-8"));
+        // m_doc->setEncoding(XS("UTF-8"));
         m_release_doc = true;
 
-        BOOST_LOGL(app, info) << __FUNCTION__ << ": Log Created";
+        cerr << __FUNCTION__ << ": Log Created";
     }
 }
 
 
 Log::~Log(void)
 {
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    cerr << __FUNCTION__;
 
     if(m_release_doc)
     {
@@ -93,64 +95,57 @@ Log::~Log(void)
 
 void Log::serialize(const std::basic_string<TCHAR> & s) const
 {
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    cerr << __FUNCTION__;
 
     DOMImplementationLS * impl = (DOMImplementationLS *)
         DOMImplementationRegistry::getDOMImplementation(XS("LS"));
 
-    DOMWriter * writer = impl->createDOMWriter();
+	DOMLSSerializer* writer = impl->createLSSerializer();
 
-    if(writer->canSetFeature(XMLUni::fgDOMWRTFormatPrettyPrint, true))
-        writer->setFeature(XMLUni::fgDOMWRTFormatPrettyPrint, true);
+	DOMConfiguration* dc = writer->getDomConfig();
+	
 
-    if(writer->canSetFeature(XMLUni::fgDOMWRTBOM, true))
-        writer->setFeature(XMLUni::fgDOMWRTBOM, true);
-
-    if(writer->canSetFeature(XMLUni::fgDOMWhitespaceInElementContent, true))
-        writer->setFeature(XMLUni::fgDOMWhitespaceInElementContent, true);
-
-    XMLFormatTarget * ft = new LocalFileFormatTarget(s.c_str());
-
-    writer->writeNode(ft, *m_doc);
+	writer->writeToString(m_doc, 0);
+    //writer->writeNode(ft, *m_doc);
     writer->release();
 
-    delete ft;
+    //delete ft;
 }
 
 void Log::log(ITTrackInfoV1 & ti)
 {
-    BOOST_LOGL(app, info) << __FUNCTION__ << " " << m_doc;
+    cerr << __FUNCTION__ << " " << m_doc;
 
     if(!m_doc)
     {
-        BOOST_LOGL(app, info) << __FUNCTION__ << ": No log";
+        cerr << __FUNCTION__ << ": No log";
         return;
     }
 
     DOMElement * song = m_doc->createElement(XS("song"));
     DOMElement * song_child = 0;
 
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    cerr << __FUNCTION__;
     song_child = m_doc->createElement(XS("artist"));
     song_child->appendChild(m_doc->createTextNode
         (XS(reinterpret_cast<char *>(ti.artist + 1))));
     song->appendChild(song_child);
 
 
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    cerr << __FUNCTION__;
     song_child = m_doc->createElement(XS("album"));
     song_child->appendChild(m_doc->createTextNode
         (XS(reinterpret_cast<char *>(ti.album + 1))));
     song->appendChild(song_child);
 
 
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    cerr << __FUNCTION__;
     song_child = m_doc->createElement(XS("track"));
     song_child->appendChild(m_doc->createTextNode
         (XS(reinterpret_cast<char *>(ti.name + 1))));
     song->appendChild(song_child);
 
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    cerr << __FUNCTION__;
     SYSTEMTIME t;
     ::GetLocalTime(&t);
 
@@ -169,11 +164,11 @@ void Log::log(ITTrackInfoV1 & ti)
 
 void Log::log(ITTrackInfo & ti)
 {
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    cerr << __FUNCTION__;
 
     if(!m_doc)
     {
-        BOOST_LOGL(app, info) << __FUNCTION__ << ": No log";
+        cerr << __FUNCTION__ << ": No log";
         return;
     }
 
@@ -209,7 +204,7 @@ void Log::log(ITTrackInfo & ti)
     song_child->appendChild(m_doc->createTextNode((XMLCh*) wss.str().c_str()));
     song->appendChild(song_child);
 
-	BOOST_LOGL(app, info) << wss.str().c_str();
+	cerr << wss.str().c_str();
 
     m_doc->getDocumentElement()->appendChild(song);
 }
@@ -217,7 +212,7 @@ void Log::log(ITTrackInfo & ti)
 
 std::map<std::basic_string<XMLCh>, int> Log::artistListeningDistribution() const
 {
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    cerr << __FUNCTION__;
 
     DOMTreeWalker * i = m_doc->createTreeWalker(
         m_doc->getDocumentElement(), DOMNodeFilter::SHOW_TEXT |
@@ -235,7 +230,7 @@ std::map<std::basic_string<XMLCh>, int> Log::artistListeningDistribution() const
 
 std::vector<const DOMElement *> Log::lastPlayedSongs(unsigned int n) const
 {
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    cerr << __FUNCTION__;
 
     DOMNodeList * list = m_doc->getElementsByTagName(XS("song"));
     XMLSize_t e = list->getLength();
@@ -256,7 +251,7 @@ std::vector<const DOMElement *> Log::lastPlayedSongs(unsigned int n) const
 
             if(!cur)
             {
-                BOOST_LOGL(app, info) << "Why? Item is zero";
+                cerr << "Why? Item is zero";
             }
             else
             {
@@ -265,7 +260,7 @@ std::vector<const DOMElement *> Log::lastPlayedSongs(unsigned int n) const
         }
         catch(std::bad_cast & e)
         {
-            BOOST_LOGL(app, info) << __FUNCTION__ << ": Bad cast - " << e.what();
+            cerr << __FUNCTION__ << ": Bad cast - " << e.what();
         }
     }
 
@@ -298,7 +293,7 @@ std::vector<const DOMElement *> Log::lastPlayedSongs(unsigned int n) const
 
 void Plugin::imgwrite()
 {
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    cerr << __FUNCTION__;
 
     std::map<std::wstring, int> a = artists();
 
@@ -371,7 +366,7 @@ void Plugin::imgwrite()
 
         catch(std::bad_cast & e)
         {
-            BOOST_LOGL(app, info) << __FUNCTION__ << ": " << e.what();
+            cerr << __FUNCTION__ << ": " << e.what();
         }
     }
 

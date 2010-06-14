@@ -4,8 +4,9 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <iostream>
 
-#include "dbgUtils.hpp"
+using namespace std;
 #include <xercesc/dom/DOMElement.hpp>
 XERCES_CPP_NAMESPACE_USE
 
@@ -15,8 +16,8 @@ class
 
 public:
 
-    Creator() { BOOST_LOGL(app, info) << __FUNCTION__; }
-    ~Creator() { BOOST_LOGL(app, info) << __FUNCTION__; }
+    Creator() { cerr << __FUNCTION__; }
+    ~Creator() { cerr << __FUNCTION__; }
 
     void createLastPlayedChart(
         const std::vector<const DOMElement *> & arr, 

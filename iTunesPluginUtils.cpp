@@ -1,5 +1,4 @@
 #include "iTunesPluginUtils.hpp"
-#include "dbgUtils.hpp"
 
 
 unsigned int seed()
@@ -27,7 +26,7 @@ bool normalizeCurrentDirectory()
 
     if(ret == 0)
     {
-        BOOST_LOGL(app, info) << "Failed at GetModuleFileName";
+        cerr << "Failed at GetModuleFileName";
         return false;
     }
 
@@ -37,7 +36,7 @@ bool normalizeCurrentDirectory()
 
     if(ret == 0)
     {
-        BOOST_LOGL(app, info) << "Failed at SetCurrentDirectory";
+        cerr << "Failed at SetCurrentDirectory";
         return false;
     }
 
@@ -45,7 +44,7 @@ bool normalizeCurrentDirectory()
 
     if(ret == 0)
     {
-        BOOST_LOGL(app, info) << "Failed at GetCurrentDirectory";
+        cerr << "Failed at GetCurrentDirectory";
         return false;
     }
 

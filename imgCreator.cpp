@@ -1,7 +1,6 @@
 #include "imgCreator.hpp"
 #include "gdUtils.hpp"
 #include "xmlUtils.hpp"
-#include "dbgUtils.hpp"
 
 #include <xercesc/dom/DOMNodeList.hpp>
 #include <xercesc/dom/DOM.hpp>
@@ -36,7 +35,7 @@ void Creator::createLastPlayedChart(
                                     ) 
                                     const
 {
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    cerr << __FUNCTION__;
 
     int bounds[8];
 
@@ -81,7 +80,7 @@ fulltext << std::setfill('0') << std::setw(2) << t.wHour << ":"
 
 	char * err = gdImageStringFT(0, &bounds[0], 0, &v[0], fsize, 0.0, 0, 0, &fulltext_cstr[0]);
 	if(err)
-		BOOST_LOG(app) << __FUNCTION__ << "gdImageStringFT: " << err;
+		cerr << __FUNCTION__ << "gdImageStringFT: " << err;
 
 	int x = bounds[2]-bounds[6] + 6;
 	int y = bounds[3]-bounds[7] + 6;
@@ -104,33 +103,30 @@ fulltext << std::setfill('0') << std::setw(2) << t.wHour << ":"
 
 	err = gdImageStringFT(image.p, &bounds[0], pen, &v[0], fsize, 0.0, x, y, &fulltext_cstr[0]);
 	if(err)
-		BOOST_LOG(app) << __FUNCTION__ << "gdImageStringFT: " << err;
+		cerr << __FUNCTION__ << "gdImageStringFT: " << err;
 
-	fstream o(file.c_str(), ios::binary | ios::trunc | ios::out);
-
-	int size = 0;
-	void * rawJpegData = gdImageJpegPtr(image.p, &size, -1);
-
-	o.write(static_cast<char *>(rawJpegData), size);
-
-	gdFree(rawJpegData);
+	int size;
+	std::ofstream of(file.c_str(), ios::binary | ios::out);
+	void * pwrite = gdImagePngPtr(image.p, &size);
+	of.write((char *)pwrite, size);
+	gdFree(pwrite);
 }
 
 
 
 void Creator::createDynaLastPlayed(const std::vector<const DOMElement *> & arr, const std::basic_string<TCHAR> & file) const
 {
-    BOOST_LOGL(app, info) << __FUNCTION__;
+    cerr << __FUNCTION__;
 
     DOMImplementation * impl = DOMImplementationRegistry::getDOMImplementation(XS("LS"));
     DOMImplementationLS * impl_ls = (DOMImplementationLS *) impl;
 
-    DOMWriter * writer = impl_ls->createDOMWriter();
 
     DOMDocument * doc = impl->createDocument(XS("root"), XS("signature"), 0);
-    doc->setEncoding(XS("UTF-8"));
+    //doc->setEncoding(XS("UTF-8"));
 
     DOMElement * items = doc->createElement(XS("items"));
+
 
 
     int x = 5, y = 5;
@@ -183,20 +179,13 @@ void Creator::createDynaLastPlayed(const std::vector<const DOMElement *> & arr, 
 
     doc->getDocumentElement()->appendChild(items);
 
-    if(writer->canSetFeature(XMLUni::fgDOMWRTFormatPrettyPrint, true))
-        writer->setFeature(XMLUni::fgDOMWRTFormatPrettyPrint, true);
 
-    if(writer->canSetFeature(XMLUni::fgDOMWRTBOM, true))
-        writer->setFeature(XMLUni::fgDOMWRTBOM, true);
+	DOMLSSerializer* writer = impl->createLSSerializer();
+	DOMConfiguration* dc = writer->getDomConfig();
+	
 
-    if(writer->canSetFeature(XMLUni::fgDOMWhitespaceInElementContent, true))
-        writer->setFeature(XMLUni::fgDOMWhitespaceInElementContent, true);
-
-    XMLFormatTarget * ft = new LocalFileFormatTarget(file.c_str());
-
-    writer->writeNode(ft, *doc);
+	writer->writeToString(doc, 0);
     writer->release();
 
-    delete ft;
     delete doc;
 }

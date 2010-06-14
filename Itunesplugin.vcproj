@@ -39,10 +39,9 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/GL&#x0D;&#x0A;&#x0D;&#x0A;"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Hell\xerces-c-src_2_8_0\src&quot;;C:\Hell\boost_1_40_0;&quot;C:\Hell\curl-7.19.4\include&quot;;C:\Hell\Libgd\include"
-				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;PROJ_R, _DEBUG, WIN32, PLATFORM_WIN32, BOOST_LOG_NO_LIB"
+				AdditionalIncludeDirectories="&quot;C:\Hell\xerces-c-3.0.1\src&quot;;&quot;C:\Hell\curl-7.19.4\include&quot;;C:\Hell\Libgd\include"
+				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;PROJ_R, _DEBUG, WIN32, PLATFORM_WIN32"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
@@ -62,9 +61,9 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="libcurl_imp.lib user32.lib kernel32.lib gdi32.lib bgd.lib xerces-c_2.lib comctl32.lib"
+				AdditionalDependencies="libcurl_imp.lib user32.lib kernel32.lib gdi32.lib bgd.lib xerces-c_3D.lib comctl32.lib"
 				ShowProgress="0"
-				AdditionalLibraryDirectories="&quot;C:\Hell\curl-7.19.7\lib\DLL-Release&quot;;&quot;C:\Hell\xerces-c-src_2_8_0\Build\Win32\VC8\Release&quot;;C:\Hell\boost_1_40_0\stage\lib;C:\Hell\Libgd\lib;&quot;C:\Hell\curl-7.19.4\lib&quot;"
+				AdditionalLibraryDirectories="&quot;C:\Hell\curl-7.19.7\lib\DLL-Release&quot;;&quot;C:\Hell\xerces-c-3.0.1\Build\Win32\VC9\Debug&quot;;&quot;C:\Hell\gd-2.0.35\bgd.dir\Debug\&quot;;&quot;C:\Hell\curl-7.19.4\lib&quot;"
 				GenerateDebugInformation="true"
 				RandomizedBaseAddress="1"
 				DataExecutionPrevention="0"
@@ -118,8 +117,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;C:\Hell\xerces-c-src_2_8_0\src&quot;;C:\Hell\boost_1_40_0;&quot;C:\Hell\curl-7.19.4\include&quot;;C:\Hell\Libgd\include"
-				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;PLATFORM_WIN32;BOOST_LOG_NO_LIB;XML_LIBRARY;CURL_STATICLIB"
+				AdditionalIncludeDirectories="&quot;C:\Hell\xerces-c-3.0.1\src&quot;;&quot;C:\Hell\curl-7.19.4\include&quot;;&quot;C:\Hell\gd-2.0.35\&quot;"
+				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;PLATFORM_WIN32;XML_LIBRARY;CURL_STATICLIB;XERCES_STATIC_LIBRARY"
 				RuntimeLibrary="2"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="true"
@@ -137,8 +136,8 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/nodefaultlib:&quot;libcmt.lib&quot;"
-				AdditionalDependencies="xerces-c_static_2.lib libcurl.lib user32.lib kernel32.lib gdi32.lib bgd.lib comctl32.lib ws2_32.lib wldap32.lib"
-				AdditionalLibraryDirectories="&quot;C:\Hell\xerces-c-src_2_8_0\Build\Win32\VC7.1\StaticRelease&quot;;C:\Hell\boost_1_40_0\stage\lib;C:\Hell\Libgd\lib;&quot;C:\Hell\curl-7.19.7\lib\LIB-Release&quot;"
+				AdditionalDependencies="xerces-c_static_3.lib libcurl.lib bgd.lib user32.lib kernel32.lib gdi32.lib comctl32.lib ws2_32.lib wldap32.lib"
+				AdditionalLibraryDirectories="&quot;C:\Hell\xerces-c-3.0.1\Build\Win32\VC9\Static Release&quot;;&quot;C:\Hell\gd-2.0.35\bgd.dir\Release&quot;;&quot;C:\Hell\curl-7.19.7\lib\LIB-Release&quot;"
 				IgnoreAllDefaultLibraries="false"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
@@ -179,14 +178,6 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\dbgUtils.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Hell\boost_1_40_0\libs\log\src\functions.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\httpUploader.cpp"
 				>
 			</File>
@@ -210,17 +201,9 @@
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalOptions="/I &quot;C:\Hell\curl-7.19.7\include&quot; \I &quot;C:\Hell\Libgd\include&quot; \I &quot;C:\Hell\boost_1_40_0&quot; \I &quot;C:\Hell\xerces-c-3.0.1\src&quot;"
+						AdditionalOptions="/I &quot;C:\Hell\curl-7.19.7\include&quot; /I &quot;C:\Hell\Libgd\include&quot; /I &quot;C:\Hell\boost_1_40_0&quot; /I &quot;C:\Hell\xerces-c-3.0.1\src&quot;"
 					/>
 				</FileConfiguration>
-			</File>
-			<File
-				RelativePath="..\..\Hell\boost_1_40_0\libs\log\src\log.cpp"
-				>
-			</File>
-			<File
-				RelativePath="..\..\Hell\boost_1_40_0\libs\log\src\log_manager.cpp"
-				>
 			</File>
 			<File
 				RelativePath=".\xmlLog.cpp"
@@ -236,10 +219,6 @@
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
-			<File
-				RelativePath=".\dbgUtils.hpp"
-				>
-			</File>
 			<File
 				RelativePath=".\gdUtils.hpp"
 				>
