@@ -1,7 +1,6 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "xmlLog.hpp"
-#include "gdUtils.hpp"
 #include "iTunesVisualAPI.h"
 
 #include <xercesc/dom/DOM.hpp>
