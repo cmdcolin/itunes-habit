@@ -1,5 +1,7 @@
 #include "iTunesPluginUtils.hpp"
 
+#include <strsafe.h>
+
 
 unsigned int seed()
 {
@@ -17,34 +19,29 @@ unsigned int seed()
 // Returns false on failure
 // More info in GetLastError
 
-bool normalizeCurrentDirectory()
+bool NormalizeCurrentDirectory()
 {
-    std::vector<TCHAR> v(256);
-    DWORD ret = 0;
+    TCHAR buffer[MAX_PATH];
+    TCHAR substr[MAX_PATH];
+    long long ret = 0;
 
-    ret = ::GetModuleFileName(0, &v[0], static_cast<DWORD>(v.size()));
-
-    if(ret == 0)
+    if(!GetModuleFileName(0, buffer, MAX_PATH))
     {
-        cerr << "Failed at GetModuleFileName";
+        cout << "Failed at GetModuleFileName" << "\n";
         return false;
     }
 
-    std::basic_string<TCHAR> s(v.begin(), v.end());
+    // find last backslash
+    ret = wcsrchr(buffer, L'\\') - buffer;
 
-    ret = ::SetCurrentDirectory(s.substr(0, s.rfind('\\')).c_str());
 
-    if(ret == 0)
+    // copy ret characters into substr
+    wcsncpy(substr, buffer, ret);
+    substr[ret] = L'\0';
+
+    if(!SetCurrentDirectory(substr))
     {
-        cerr << "Failed at SetCurrentDirectory";
-        return false;
-    }
-
-    ret = ::GetCurrentDirectory(static_cast<DWORD>(v.size()), &v.at(0));
-
-    if(ret == 0)
-    {
-        cerr << "Failed at GetCurrentDirectory";
+        cout << "Failed at SetCurrentDirectory" << "\n";
         return false;
     }
 
@@ -54,7 +51,7 @@ bool normalizeCurrentDirectory()
 
 BOOL WINAPI DllMain(
                     HINSTANCE /* instance */,
-                    DWORD reason,
+                    DWORD /* reason */,
                     LPVOID /* reserved */
                     )
 {

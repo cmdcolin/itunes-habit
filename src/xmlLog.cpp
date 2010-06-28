@@ -1,5 +1,3 @@
-#define _CRT_SECURE_NO_WARNINGS
-
 #include "xmlLog.hpp"
 #include "iTunesVisualAPI.h"
 
@@ -18,7 +16,7 @@ Log::Log(
          bool exists
          )
 {
-    cerr << __FUNCTION__;
+    cout << __FUNCTION__ << "\n";
 
     if(exists)
     {
@@ -32,31 +30,28 @@ Log::Log(
         parser->setValidationSchemaFullChecking(true);
         parser->setLoadExternalDTD(true);
 
-        cerr << __FUNCTION__ << ": " << t.c_str();
-
         try
         {
             parser->parse(t.c_str());
         }
         catch(XMLException & e)
         {
-            cerr << __FUNCTION__ << ": Rad - " << e.getMessage();
+            cout << __FUNCTION__ << ": Rad - " << e.getMessage() << "\n";
         }
         catch(DOMException & e)
         {
-            cerr << __FUNCTION__ << ": Bad - " << e.getMessage();
+            cout << __FUNCTION__ << ": Bad - " << e.getMessage() << "\n";
         }
         catch(...)
         {
-            cerr << __FUNCTION__ << ": Unknown exception";
+            cout << __FUNCTION__ << ": Unknown exception" << "\n";
         }
 
-        cerr << __FUNCTION__;
 
         m_doc = parser->getDocument();
         m_release_doc = false;
 
-        cerr << __FUNCTION__ << ": Log Parsed: " << m_doc;
+        cout << __FUNCTION__ << ": Log Parsed: " << m_doc << "\n";
     }
 
     else
@@ -77,14 +72,14 @@ Log::Log(
         // m_doc->setEncoding(XS("UTF-8"));
         m_release_doc = true;
 
-        cerr << __FUNCTION__ << ": Log Created";
+        cout << __FUNCTION__ << ": Log Created" << "\n";
     }
 }
 
 
 Log::~Log(void)
 {
-    cerr << __FUNCTION__;
+    cout << __FUNCTION__ << "\n";
 
     if(m_release_doc)
     {
@@ -94,7 +89,7 @@ Log::~Log(void)
 
 void Log::serialize(const std::basic_string<TCHAR> & s) const
 {
-    cerr << __FUNCTION__;
+    cout << __FUNCTION__ << "\n";
 
     DOMImplementationLS * impl = (DOMImplementationLS *)
         DOMImplementationRegistry::getDOMImplementation(XS("LS"));
@@ -113,42 +108,38 @@ void Log::serialize(const std::basic_string<TCHAR> & s) const
 
 void Log::log(ITTrackInfoV1 & ti)
 {
-    cerr << __FUNCTION__ << " " << m_doc;
+    cout << __FUNCTION__ << " " << m_doc << "\n";
 
     if(!m_doc)
     {
-        cerr << __FUNCTION__ << ": No log";
+        cout << __FUNCTION__ << ": No log" << "\n";
         return;
     }
 
     DOMElement * song = m_doc->createElement(XS("song"));
     DOMElement * song_child = 0;
 
-    cerr << __FUNCTION__;
     song_child = m_doc->createElement(XS("artist"));
     song_child->appendChild(m_doc->createTextNode
-        (XS(reinterpret_cast<char *>(ti.artist + 1))));
+        (XS((char*) ti.artist + 1)));
     song->appendChild(song_child);
 
 
-    cerr << __FUNCTION__;
     song_child = m_doc->createElement(XS("album"));
     song_child->appendChild(m_doc->createTextNode
-        (XS(reinterpret_cast<char *>(ti.album + 1))));
+        (XS((char*) ti.album + 1)));
     song->appendChild(song_child);
 
 
-    cerr << __FUNCTION__;
     song_child = m_doc->createElement(XS("track"));
     song_child->appendChild(m_doc->createTextNode
-        (XS(reinterpret_cast<char *>(ti.name + 1))));
+        (XS((char*)  ti.name + 1)));
     song->appendChild(song_child);
 
-    cerr << __FUNCTION__;
     SYSTEMTIME t;
-    ::GetLocalTime(&t);
+    GetLocalTime(&t);
 
-    std::wstringstream wss;
+    wstringstream wss;
     wss
         << t.wYear << L":" << t.wMonth << L":" << t.wDay << L":"
         << t.wDayOfWeek << L":" << t.wHour << L":" << t.wMinute
@@ -163,11 +154,11 @@ void Log::log(ITTrackInfoV1 & ti)
 
 void Log::log(ITTrackInfo & ti)
 {
-    cerr << __FUNCTION__;
+    cout << __FUNCTION__ << "\n";
 
     if(!m_doc)
     {
-        cerr << __FUNCTION__ << ": No log";
+        cout << __FUNCTION__ << ": No log" << "\n";
         return;
     }
 
@@ -176,24 +167,24 @@ void Log::log(ITTrackInfo & ti)
 
     song_child = m_doc->createElement(XS("artist"));
     song_child->appendChild(m_doc->createTextNode
-        (reinterpret_cast<XMLCh *>(ti.artist + 1)));
+        ((XMLCh *) ti.artist + 1));
     song->appendChild(song_child);
 
     song_child = m_doc->createElement(XS("album"));
     song_child->appendChild(m_doc->createTextNode
-        (reinterpret_cast<XMLCh *>(ti.album + 1)));
+        ((XMLCh *) ti.album + 1));
     song->appendChild(song_child);
 
 
     song_child = m_doc->createElement(XS("track"));
     song_child->appendChild(m_doc->createTextNode
-        (reinterpret_cast<XMLCh *>(ti.name + 1)));
+        ((XMLCh *) ti.name + 1));
     song->appendChild(song_child);
 
     SYSTEMTIME t;
-    ::GetLocalTime(&t);
+    GetLocalTime(&t);
 
-    std::wstringstream wss;
+    wstringstream wss;
     wss
         << t.wYear << L" " << t.wMonth << L" " << t.wDay << L" "
         << t.wDayOfWeek << L" " << t.wHour << L" " << t.wMinute
@@ -203,21 +194,21 @@ void Log::log(ITTrackInfo & ti)
     song_child->appendChild(m_doc->createTextNode((XMLCh*) wss.str().c_str()));
     song->appendChild(song_child);
 
-    cerr << wss.str().c_str();
+    cout << wss.str().c_str() << "\n";
 
     m_doc->getDocumentElement()->appendChild(song);
 }
 
 
-std::map<std::basic_string<XMLCh>, int> Log::artistListeningDistribution() const
+map<basic_string<XMLCh>, int> Log::artistListeningDistribution() const
 {
-    cerr << __FUNCTION__;
+    cout << __FUNCTION__ << "\n";
 
     DOMTreeWalker * i = m_doc->createTreeWalker(
         m_doc->getDocumentElement(), DOMNodeFilter::SHOW_TEXT |
         DOMNodeFilter::SHOW_ELEMENT, 0, false);
 
-    std::map<std::basic_string<XMLCh>, int> m;
+    map<basic_string<XMLCh>, int> m;
 
     artistDistributionHelper(i, m);
 
@@ -229,7 +220,7 @@ std::map<std::basic_string<XMLCh>, int> Log::artistListeningDistribution() const
 
 std::vector<const DOMElement *> Log::lastPlayedSongs(unsigned int n) const
 {
-    cerr << __FUNCTION__;
+    cout << __FUNCTION__ << "\n";
 
     DOMNodeList * list = m_doc->getElementsByTagName(XS("song"));
     XMLSize_t e = list->getLength();
@@ -250,7 +241,7 @@ std::vector<const DOMElement *> Log::lastPlayedSongs(unsigned int n) const
 
             if(!cur)
             {
-                cerr << "Why? Item is zero";
+                cout << "Why? Item is zero" << "\n";
             }
             else
             {
@@ -259,7 +250,7 @@ std::vector<const DOMElement *> Log::lastPlayedSongs(unsigned int n) const
         }
         catch(std::bad_cast & e)
         {
-            cerr << __FUNCTION__ << ": Bad cast - " << e.what();
+            cout << __FUNCTION__ << ": Bad cast - " << e.what() << "\n";
         }
     }
 

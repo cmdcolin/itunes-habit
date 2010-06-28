@@ -6,40 +6,40 @@ using namespace std;
 
 Uploader::Uploader()
 {
-    cerr << __FUNCTION__;
+    cout << __FUNCTION__ << "\n";
 
     curl = curl_easy_init();
     if(!curl)
     {
-        cerr << "Curl initialization failure";
+        cout << "Curl initialization failure";
     }
 }
 
 Uploader::~Uploader()
 {
-    cerr << __FUNCTION__;
+    cout << __FUNCTION__ << "\n";
 
     curl_easy_cleanup(curl);
 }
 
-void Uploader::setScriptBackend(const std::string & s)
+void Uploader::setScriptBackend(const string & s)
 {
     backend = s;
 }
 
-void Uploader::setFormElement(const std::string & s)
+void Uploader::setFormElement(const string & s)
 {
     element = s;
 }
 
-void Uploader::setFormElementName(const std::string & s)
+void Uploader::setFormElementName(const string & s)
 {
     element_name = s;
 }
 
-int Uploader::uploadFile(const std::string & s)
+int Uploader::uploadFile(const string & s)
 {
-    cerr << __FUNCTION__;
+    cout << __FUNCTION__ << "\n";
 
     curl_httppost * post = 0;
     curl_httppost * last = 0;

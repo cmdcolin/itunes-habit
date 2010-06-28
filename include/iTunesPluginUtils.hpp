@@ -30,7 +30,7 @@ struct
         img_file(imgfike), grammar_file(grammar)
 
     {
-        cerr << __FUNCTION__;
+        cout << __FUNCTION__ << "\n";
 
         try
         {
@@ -51,17 +51,17 @@ struct
         }
         catch(XMLException & e)
         {
-            cerr << SX(e.getMessage());
+            cout << SX(e.getMessage()) << "\n";
         }
         catch(DOMException & e)
         {
-            cerr << SX(e.getMessage());
+            cout << SX(e.getMessage()) << "\n";
         }
     }
 
     ~VisualPluginDataz()
     {
-        cerr << __FUNCTION__;
+        cout << __FUNCTION__ << "\n";
 
         delete loggy;
     }
@@ -86,14 +86,6 @@ struct
     std::basic_string<TCHAR> error_log_file;
     std::basic_string<TCHAR> img_file;
     std::basic_string<TCHAR> grammar_file;
-
-    HWND dialog;
-    HWND itunes;
-
-    DWORD tid;
-    HANDLE p;
-
-    Rect r;
 
 };
 
@@ -123,7 +115,7 @@ struct
 };
 
 unsigned int seed();
-bool normalizeCurrentDirectory();
+bool NormalizeCurrentDirectory();
 
 static OSStatus VisualPluginHandler(
                                     OSType message,

@@ -14,6 +14,7 @@
 #include <vector>
 #include <memory>
 
+using namespace std;
 XERCES_CPP_NAMESPACE_USE
 
 class
@@ -22,25 +23,25 @@ class
 
 public:
 
-    Log(const std::basic_string<TCHAR> & t, bool exists);
+    Log(const basic_string<TCHAR> & t, bool exists);
     ~Log(void);
 
     void log(ITTrackInfoV1 & ti);
     void log(ITTrackInfo & ti);
 
-    void serialize(const std::basic_string<TCHAR> & s) const;
+    void serialize(const basic_string<TCHAR> & s) const;
 
-    std::vector<const DOMElement *> lastPlayedSongs(unsigned int n) const;
-    std::map<std::basic_string<XMLCh>, int> artistListeningDistribution() const;
-    static void artistDistributionHelper(DOMTreeWalker * k, std::map<std::basic_string<XMLCh>, int> & m);
+    vector<const DOMElement *> lastPlayedSongs(unsigned int n) const;
+    map<basic_string<XMLCh>, int> artistListeningDistribution() const;
+    static void artistDistributionHelper(DOMTreeWalker * k, map<basic_string<XMLCh>, int> & m);
 
-    inline const XERCES_CPP_NAMESPACE::DOMDocument * getContainedDocument() const { return m_doc; }
-    inline XERCES_CPP_NAMESPACE::DOMDocument * getContainedDocument() { return m_doc; }
+    inline const DOMDocument * getContainedDocument() const { return m_doc; }
+    inline DOMDocument * getContainedDocument() { return m_doc; }
 
 private:
 
-    std::auto_ptr<XercesDOMParser> parser;
-    XERCES_CPP_NAMESPACE::DOMDocument * m_doc;
+    auto_ptr<XercesDOMParser> parser;
+    DOMDocument * m_doc;
     bool m_release_doc;
 
 };

@@ -5,9 +5,6 @@
 #include <xercesc/dom/DOMErrorHandler.hpp>
 #include <xercesc/dom/DOMNodeFilter.hpp>
 
-#include <string>
-#include <sstream>
-
 XERCES_CPP_NAMESPACE_USE
 
 class
@@ -87,12 +84,12 @@ public:
     void warning(const SAXParseException & c);
     void error(const SAXParseException & c);
     void fatalError(const SAXParseException & c);
+    void def(const SAXParseException & c);
     void resetErrors();
 
     inline bool errors_exist() const { return num_errors != 0 || num_fatals != 0; }
     inline bool warnings_exist() const { return num_warnings != 0; }
 
-    std::wstringstream errs, warnings, fatals;
     int num_errors, num_warnings, num_fatals;
 
 };

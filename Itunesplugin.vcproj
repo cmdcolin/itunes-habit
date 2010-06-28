@@ -40,8 +40,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Hell\xerces-c-3.0.1\src&quot;;&quot;C:\Hell\curl-7.19.4\include&quot;;C:\Hell\Libgd\include"
-				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;PROJ_R, _DEBUG, WIN32, PLATFORM_WIN32"
+				AdditionalIncludeDirectories="&quot;C:\Hell\xerces-c-3.0.1\src&quot;;&quot;C:\Hell\curl-7.19.4\include&quot;;C:\Hell\Libgd\include;res;include"
+				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;PROJ_R, _DEBUG, WIN32, PLATFORM_WIN32,_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="0"
 				RuntimeLibrary="3"
@@ -117,8 +117,8 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;C:\Hell\xerces-c-3.0.1\src&quot;;&quot;C:\Hell\curl-7.19.4\include&quot;;&quot;C:\Hell\gd-2.0.35\&quot;"
-				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;PLATFORM_WIN32;XML_LIBRARY;CURL_STATICLIB;XERCES_STATIC_LIBRARY"
+				AdditionalIncludeDirectories="&quot;C:\Hell\xerces-c-3.0.1\src&quot;;&quot;C:\Hell\curl-7.19.4\include&quot;;&quot;C:\Hell\gd-2.0.35\&quot;;res;include"
+				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;PLATFORM_WIN32;XML_LIBRARY;CURL_STATICLIB;XERCES_STATIC_LIBRARY;_CRT_SECURE_NO_WARNINGS"
 				RuntimeLibrary="2"
 				WarningLevel="4"
 				Detect64BitPortabilityProblems="true"
@@ -178,39 +178,43 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
-				RelativePath=".\httpUploader.cpp"
+				RelativePath=".\src\guicon.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\imgCreator.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\iTunesApi.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\iTunesPlugin.cpp"
-				>
-			</File>
-			<File
-				RelativePath=".\iTunesPluginUtils.cpp"
+				RelativePath=".\src\httpUploader.cpp"
 				>
 				<FileConfiguration
 					Name="Debug|Win32"
 					>
 					<Tool
 						Name="VCCLCompilerTool"
-						AdditionalOptions="/I &quot;C:\Hell\curl-7.19.7\include&quot; /I &quot;C:\Hell\Libgd\include&quot; /I &quot;C:\Hell\boost_1_40_0&quot; /I &quot;C:\Hell\xerces-c-3.0.1\src&quot;"
+						AdditionalIncludeDirectories="include;res;"
 					/>
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\xmlLog.cpp"
+				RelativePath=".\src\imgCreator.cpp"
 				>
 			</File>
 			<File
-				RelativePath=".\xmlUtils.cpp"
+				RelativePath=".\src\iTunesAPI.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\iTunesPlugin.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\iTunesPluginUtils.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\xmlLog.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\src\xmlUtils.cpp"
 				>
 			</File>
 		</Filter>
@@ -220,35 +224,39 @@
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
 			>
 			<File
-				RelativePath=".\gdUtils.hpp"
+				RelativePath=".\include\guicon.h"
 				>
 			</File>
 			<File
-				RelativePath=".\httpUploader.hpp"
+				RelativePath=".\include\httpUploader.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\imgCreator.hpp"
+				RelativePath=".\include\imgCreator.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\iTunesAPI.h"
+				RelativePath=".\include\iTunesAPI.h"
 				>
 			</File>
 			<File
-				RelativePath=".\iTunesPluginUtils.hpp"
+				RelativePath=".\include\iTunesPluginUtils.hpp"
 				>
 			</File>
 			<File
-				RelativePath=".\Resource.k"
+				RelativePath=".\include\iTunesVisualAPI.h"
 				>
 			</File>
 			<File
-				RelativePath=".\xmlLog.hpp"
+				RelativePath=".\res\resource.h"
 				>
 			</File>
 			<File
-				RelativePath=".\xmlUtils.hpp"
+				RelativePath=".\include\xmlLog.hpp"
+				>
+			</File>
+			<File
+				RelativePath=".\include\xmlUtils.hpp"
 				>
 			</File>
 		</Filter>
@@ -258,7 +266,7 @@
 			UniqueIdentifier="{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}"
 			>
 			<File
-				RelativePath=".\Resource.rc"
+				RelativePath=".\res\Resource.rc"
 				>
 			</File>
 		</Filter>

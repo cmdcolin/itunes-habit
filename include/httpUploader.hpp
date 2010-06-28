@@ -3,6 +3,8 @@
 #include <curl/curl.h>
 #include <string>
 
+
+using namespace std;
 class Uploader
 {
 
@@ -11,16 +13,16 @@ public:
     Uploader();
     ~Uploader();
 
-    void setScriptBackend(const std::string & script);
-    void setFormElement(const std::string & form_element);
-    void setFormElementName(const std::string & form_element_name);
-    int uploadFile(const std::string & file);
+    void setScriptBackend(const string & script);
+    void setFormElement(const string & form_element);
+    void setFormElementName(const string & form_element_name);
+    int uploadFile(const string & file);
 
 private:
 
-    std::string backend;
-    std::string element;
-    std::string element_name;
+    string backend;
+    string element;
+    string element_name;
 
     CURL * curl;
 

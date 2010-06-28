@@ -16,23 +16,23 @@ class
 
 public:
 
-    Creator() { cerr << __FUNCTION__; }
-    ~Creator() { cerr << __FUNCTION__; }
+    Creator() { cout << __FUNCTION__ << "\n"; }
+    ~Creator() { cout << __FUNCTION__ << "\n"; }
 
     void createLastPlayedChart(
-        const std::vector<const DOMElement *> & arr, 
-        const std::basic_string<TCHAR> & file, 
-        const std::string & font, 
+        const vector<const DOMElement *> & arr, 
+        const basic_string<TCHAR> & file, 
+        const string & font, 
         int size) const;
 
     void createArtistGraph(
-        const std::map<std::wstring, int> & i, 
-        const std::basic_string<TCHAR> & file
+        const map<wstring, int> & i, 
+        const basic_string<TCHAR> & file
         ) const;
 
     void createDynaLastPlayed(
-        const std::vector<const DOMElement *> & arr, 
-        const std::basic_string<TCHAR> & file
+        const vector<const DOMElement *> & arr, 
+        const basic_string<TCHAR> & file
         ) const;
 
 private:
