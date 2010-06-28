@@ -14,7 +14,6 @@
 #include <string>
 #include <vector>
 
-#include <tchar.h>
 
 
 struct
@@ -67,16 +66,16 @@ struct
         delete loggy;
     }
 
-	void *			cookie;
-	ITAppProcPtr	proc;
+    void *			cookie;
+    ITAppProcPtr	proc;
 
-	ITTrackInfoV1	trackInfo;
-	ITStreamInfoV1	streamInfo;
+    ITTrackInfoV1	trackInfo;
+    ITStreamInfoV1	streamInfo;
 
     ITTrackInfo     trackUniInfo;
     ITStreamInfo    streamUniInfo;
 
-	Boolean	playing;
+    Boolean	playing;
 
     Log *     loggy;
     Creator   ic;
@@ -103,13 +102,13 @@ struct
 //
 
 template <typename T>
-    struct
-        converter
+struct
+    converter
 {
     std::vector<T> r;
 
     template <typename U>
-        void operator () (U u)
+    void operator () (U u)
     {
         r.push_back(static_cast<T>(u));
     }
@@ -146,10 +145,10 @@ BOOL CALLBACK DlgProc(
                       );
 
 BOOL WINAPI DllMain(
-    HINSTANCE /* instance */,
-    DWORD reason,
-    LPVOID /* reserved */
-    );
+                    HINSTANCE /* instance */,
+                    DWORD reason,
+                    LPVOID /* reserved */
+                    );
 
 
 extern "C" __declspec(dllexport) OSStatus iTunesPluginMain(

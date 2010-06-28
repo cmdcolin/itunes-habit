@@ -68,7 +68,7 @@ void ErrorReporter::resetErrors()
 
 
 Filter::Filter(unsigned long s)
-    : show(s)
+: show(s)
 {
 }
 

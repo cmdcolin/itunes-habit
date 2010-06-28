@@ -240,10 +240,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\iTunesVisualApi.hpp"
-				>
-			</File>
-			<File
 				RelativePath=".\Resource.k"
 				>
 			</File>

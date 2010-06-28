@@ -376,8 +376,10 @@ static OSStatus VisualPluginHandler(
 
             catch(XMLException & e)
             {
-                ::MessageBox(HWND_DESKTOP, TEXT("Xerces XML API failed to initialize"),
+                MessageBox(HWND_DESKTOP, TEXT("Xerces XML API failed to initialize"),
                     TEXT("Fatal Error"), MB_OK | MB_ICONEXCLAMATION);
+
+                MessageBox(0, e.getMessage(), TEXT("Fatal Error"), MB_OK);
 
                 status = unimpErr;
             }
@@ -531,18 +533,18 @@ static OSStatus VisualPluginHandler(
             {
                 vpd->loggy->log(vpd->trackUniInfo);
 
-				vpd->ic.createLastPlayedChart(
+                vpd->ic.createLastPlayedChart(
                     vpd->loggy->lastPlayedSongs(5), 
                     vpd->img_file, 
                     getFont("C:\\*"),
                     24);
 
-//
-//#if defined(_UNICODE)
-//                if(!vpd->up.uploadFile(SX(vpd->img_file.c_str())))
-//#else
-//                if(!vpd->up.uploadFile(vpd->img_file.c_str()))
-//#endif
+                //
+                //#if defined(_UNICODE)
+                //                if(!vpd->up.uploadFile(SX(vpd->img_file.c_str())))
+                //#else
+                //                if(!vpd->up.uploadFile(vpd->img_file.c_str()))
+                //#endif
 
                 {
                     cerr << "Upload failed";
@@ -678,70 +680,70 @@ static OSStatus RegisterVisualPlugin(PluginMessageInfo *messageInfo)
 {
     cerr << __FUNCTION__;
 
-    PlayerMessageInfo playerMessageInfo = {0};
+    PlayerMessageInfo pm = {0};
 
     //
     // Set plug-in version information
     //
 
-	SetNumVersion(&playerMessageInfo.u.registerVisualPluginMessage.pluginVersion,kTVisualPluginMajorVersion,kTVisualPluginMinorVersion,kTVisualPluginReleaseStage,kTVisualPluginNonFinalRelease);
+    SetNumVersion(&pm.u.registerVisualPluginMessage.pluginVersion,kTVisualPluginMajorVersion,kTVisualPluginMinorVersion,kTVisualPluginReleaseStage,kTVisualPluginNonFinalRelease);
 
 
-    playerMessageInfo.u.registerVisualPluginMessage.timeBetweenDataInMS		= 0xFFFFFFFF;
-    playerMessageInfo.u.registerVisualPluginMessage.numWaveformChannels		= 2;
-    playerMessageInfo.u.registerVisualPluginMessage.numSpectrumChannels		= 2;
+    pm.u.registerVisualPluginMessage.timeBetweenDataInMS		= 0xFFFFFFFF;
+    pm.u.registerVisualPluginMessage.numWaveformChannels		= 2;
+    pm.u.registerVisualPluginMessage.numSpectrumChannels		= 2;
 
-    playerMessageInfo.u.registerVisualPluginMessage.minWidth				= 64;
-    playerMessageInfo.u.registerVisualPluginMessage.minHeight				= 64;
-    playerMessageInfo.u.registerVisualPluginMessage.maxWidth				= 32767;
-    playerMessageInfo.u.registerVisualPluginMessage.maxHeight				= 32767;
+    pm.u.registerVisualPluginMessage.minWidth				= 64;
+    pm.u.registerVisualPluginMessage.minHeight				= 64;
+    pm.u.registerVisualPluginMessage.maxWidth				= 32767;
+    pm.u.registerVisualPluginMessage.maxHeight				= 32767;
 
-    playerMessageInfo.u.registerVisualPluginMessage.minFullScreenBitDepth	= 0;
-    playerMessageInfo.u.registerVisualPluginMessage.maxFullScreenBitDepth	= 0;
-    playerMessageInfo.u.registerVisualPluginMessage.windowAlignmentInBytes	= 0;
-    playerMessageInfo.u.registerVisualPluginMessage.registerRefCon	        = 0;
+    pm.u.registerVisualPluginMessage.minFullScreenBitDepth	= 0;
+    pm.u.registerVisualPluginMessage.maxFullScreenBitDepth	= 0;
+    pm.u.registerVisualPluginMessage.windowAlignmentInBytes	= 0;
+    pm.u.registerVisualPluginMessage.registerRefCon	        = 0;
 
 
     //
     // Plug-in name (length prepended)
     //
 
-	
-	Str255				pluginName = kTVisualPluginName;
-	memcpy(&playerMessageInfo.u.registerVisualPluginMessage.name[0], &pluginName[0], pluginName[0] + 1);
+
+    Str255				pluginName = kTVisualPluginName;
+    memcpy(&pm.u.registerVisualPluginMessage.name[0], &pluginName[0], pluginName[0] + 1);
 
 
-	SetNumVersion(&playerMessageInfo.u.registerVisualPluginMessage.pluginVersion,kTVisualPluginMajorVersion,kTVisualPluginMinorVersion,kTVisualPluginReleaseStage,kTVisualPluginNonFinalRelease);
+    SetNumVersion(&pm.u.registerVisualPluginMessage.pluginVersion,kTVisualPluginMajorVersion,kTVisualPluginMinorVersion,kTVisualPluginReleaseStage,kTVisualPluginNonFinalRelease);
 
-	playerMessageInfo.u.registerVisualPluginMessage.options					=	kVisualWantsIdleMessages;
+    pm.u.registerVisualPluginMessage.options					=	kVisualWantsIdleMessages;
 
-	playerMessageInfo.u.registerVisualPluginMessage.handler					= (VisualPluginProcPtr)VisualPluginHandler;
-	playerMessageInfo.u.registerVisualPluginMessage.registerRefCon			= 0;
-	playerMessageInfo.u.registerVisualPluginMessage.creator					= kTVisualPluginCreator;
-	
-	playerMessageInfo.u.registerVisualPluginMessage.timeBetweenDataInMS		= 0xFFFFFFFF; // 16 milliseconds = 1 Tick,0xFFFFFFFF = Often as possible.
-	playerMessageInfo.u.registerVisualPluginMessage.numWaveformChannels		= 2;
-	playerMessageInfo.u.registerVisualPluginMessage.numSpectrumChannels		= 2;
-	
-	playerMessageInfo.u.registerVisualPluginMessage.minWidth				= 64;
-	playerMessageInfo.u.registerVisualPluginMessage.minHeight				= 64;
-	playerMessageInfo.u.registerVisualPluginMessage.maxWidth				= 32767;
-	playerMessageInfo.u.registerVisualPluginMessage.maxHeight				= 32767;
-	playerMessageInfo.u.registerVisualPluginMessage.minFullScreenBitDepth	= 0;
-	playerMessageInfo.u.registerVisualPluginMessage.maxFullScreenBitDepth	= 0;
-	playerMessageInfo.u.registerVisualPluginMessage.windowAlignmentInBytes	= 0;
-	
-    //playerMessageInfo.u.registerVisualPluginMessage.name[0] =
+    pm.u.registerVisualPluginMessage.handler					= (VisualPluginProcPtr)VisualPluginHandler;
+    pm.u.registerVisualPluginMessage.registerRefCon			= 0;
+    pm.u.registerVisualPluginMessage.creator					= kTVisualPluginCreator;
+
+    pm.u.registerVisualPluginMessage.timeBetweenDataInMS		= 0xFFFFFFFF; // 16 milliseconds = 1 Tick,0xFFFFFFFF = Often as possible.
+    pm.u.registerVisualPluginMessage.numWaveformChannels		= 2;
+    pm.u.registerVisualPluginMessage.numSpectrumChannels		= 2;
+
+    pm.u.registerVisualPluginMessage.minWidth				= 64;
+    pm.u.registerVisualPluginMessage.minHeight				= 64;
+    pm.u.registerVisualPluginMessage.maxWidth				= 32767;
+    pm.u.registerVisualPluginMessage.maxHeight				= 32767;
+    pm.u.registerVisualPluginMessage.minFullScreenBitDepth	= 0;
+    pm.u.registerVisualPluginMessage.maxFullScreenBitDepth	= 0;
+    pm.u.registerVisualPluginMessage.windowAlignmentInBytes	= 0;
+
+    //pm.u.registerVisualPluginMessage.name[0] =
     //    static_cast<UInt8>(strlen("Habit"));
 
-    //strcpy(reinterpret_cast<char *>(&playerMessageInfo.u.registerVisualPluginMessage.name[1]), "Habit");
+    //strcpy(reinterpret_cast<char *>(&pm.u.registerVisualPluginMessage.name[1]), "Habit");
 
     //
     // Register it
     //
 
     return PlayerRegisterVisualPlugin(messageInfo->u.initMessage.appCookie,
-        messageInfo->u.initMessage.appProc, &playerMessageInfo);
+        messageInfo->u.initMessage.appProc, &pm);
 }
 
 //########################################
@@ -750,36 +752,36 @@ static OSStatus RegisterVisualPlugin(PluginMessageInfo *messageInfo)
 
 extern "C"
 {
-IMPEXP OSStatus MAIN(OSType message,PluginMessageInfo *messageInfo,void *refCon)
-{
-
+    IMPEXP OSStatus MAIN(OSType message,PluginMessageInfo *messageInfo,void *refCon)
     {
-        OSStatus		status;
 
-        (void) refCon;
-
-        cerr << __FUNCTION__;
-
-        switch (message)
         {
-        case kPluginInitMessage:
+            OSStatus		status;
+
+            (void) refCon;
+
+            cerr << __FUNCTION__;
+
+            switch (message)
             {
-                normalizeCurrentDirectory();
-                srand(seed());
-                status = RegisterVisualPlugin(messageInfo);
+            case kPluginInitMessage:
+                {
+                    normalizeCurrentDirectory();
+                    srand(seed());
+                    status = RegisterVisualPlugin(messageInfo);
+                }
+                break;
+
+            case kPluginCleanupMessage:
+                status = noErr;
+                break;
+
+            default:
+                status = unimpErr;
+                break;
             }
-            break;
 
-        case kPluginCleanupMessage:
-            status = noErr;
-            break;
-
-        default:
-            status = unimpErr;
-            break;
+            return status;
         }
-
-        return status;
     }
-}
 }

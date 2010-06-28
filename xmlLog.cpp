@@ -23,7 +23,7 @@ Log::Log(
 
     if(exists)
     {
-		std::auto_ptr<ErrorReporter> err(new ErrorReporter());
+        std::auto_ptr<ErrorReporter> err(new ErrorReporter());
 
         parser.reset(new XercesDOMParser());
         parser->setErrorHandler(err.get());
@@ -68,9 +68,9 @@ Log::Log(
         DOMDocumentType * dtype = impl->createDocumentType(XS("log"), XS("id"),
 
 #ifndef _UNICODE
-        XS(t.c_str()));
+            XS(t.c_str()));
 #else
-        t.c_str());
+            t.c_str());
 #endif
 
         m_doc = impl->createDocument(0, XS("log"), dtype);
@@ -100,12 +100,12 @@ void Log::serialize(const std::basic_string<TCHAR> & s) const
     DOMImplementationLS * impl = (DOMImplementationLS *)
         DOMImplementationRegistry::getDOMImplementation(XS("LS"));
 
-	DOMLSSerializer* writer = impl->createLSSerializer();
+    DOMLSSerializer* writer = impl->createLSSerializer();
 
-	DOMConfiguration* dc = writer->getDomConfig();
-	
+    DOMConfiguration* dc = writer->getDomConfig();
 
-	writer->writeToString(m_doc, 0);
+
+    writer->writeToString(m_doc, 0);
     //writer->writeNode(ft, *m_doc);
     writer->release();
 
@@ -204,7 +204,7 @@ void Log::log(ITTrackInfo & ti)
     song_child->appendChild(m_doc->createTextNode((XMLCh*) wss.str().c_str()));
     song->appendChild(song_child);
 
-	cerr << wss.str().c_str();
+    cerr << wss.str().c_str();
 
     m_doc->getDocumentElement()->appendChild(song);
 }
@@ -289,96 +289,3 @@ std::vector<const DOMElement *> Log::lastPlayedSongs(unsigned int n) const
 }
 
 
-/*
-
-void Plugin::imgwrite()
-{
-    cerr << __FUNCTION__;
-
-    std::map<std::wstring, int> a = artists();
-
-    struct comparator :
-        public std::binary_function
-            <
-                std::pair<std::wstring, int>,
-                std::pair<std::wstring, int>,
-                bool
-            >
-    {
-        bool operator () (const std::pair<std::wstring, int> & x, const std::pair<std::wstring, int> & y)
-        {
-            return x.second < y.second;
-        }
-    };
-
-    std::vector< std::pair<std::wstring, int> > v(a.begin(), a.end());
-    std::sort(v.begin(), v.end(), comparator());
-
-    size_t r = 0;
-
-    std::vector< std::pair<std::wstring, int> >::reverse_iterator it = v.rbegin();
-    std::vector< std::pair<std::wstring, int> >::iterator ita = v.begin();
-
-    while(r++ < ((v.size() < 5) ? v.size() : 5))
-    {
-        ita++;
-        it++;
-    }
-
-
-    gdFontPtr font = gdFontGetTiny();
-	gdWimage image(500, 10 + font->h * 5);
-
-    gdImageFilledRectangle(image.p, 1, 1, image.p->sx - 2, image.p->sy - 2,
-        gdImageColorAllocate(image.p, randRange(128, 196), randRange(128, 196), randRange(128, 196)));
-    gdImageRectangle(image.p, 0, 0, image.p->sx - 1, image.p->sy - 1,
-        gdImageColorAllocate(image.p, 0, 0, 0));
-
-    DOMNodeList * songs = m_doc->getElementsByTagName(XS("song"));
-
-    for(XMLSize_t i = 0, k = songs->getLength(), j = 5; i < ((v.size() < 5) ? v.size() : 5); ++i, j += font->h)
-    {
-        try
-        {
-            DOMElement * child = dynamic_cast<DOMElement *>(songs->item(k - 1 - i));
-
-            SYSTEMTIME t;
-            std::wstringstream iss, oss;
-
-            iss << child->getElementsByTagName(XS("time"))->item(0)->getTextContent();
-
-            iss >> t.wYear >> t.wMonth >> t.wDay >> t.wDayOfWeek >>
-                t.wHour >> t.wMinute >> t.wSecond >> t.wMilliseconds;
-
-            oss << t.wYear << L"/" << t.wMonth << L"/" << t.wDay << L" "
-                << t.wHour << L":" << t.wMinute << L":" << t.wSecond << " - "
-                << child->getElementsByTagName(XS("artist"))->item(0)->getTextContent() << " - "
-                << child->getElementsByTagName(XS("track"))->item(0)->getTextContent();
-
-            std::wstring temp = oss.str();
-            std::vector<wchar_t> m(temp.begin(), temp.end());
-            m.push_back(L'\0');
-
-            gdImageString16(image.p, font, 10, j,
-                reinterpret_cast<unsigned short *>(&m[0]),
-                gdImageColorAllocate(image.p, 0, 0, 0));
-        }
-
-        catch(std::bad_cast & e)
-        {
-            cerr << __FUNCTION__ << ": " << e.what();
-        }
-    }
-
-    FILE * out = fopen("C:/img.jpg", "wb");
-
-    int size = 0;
-    void * rawJpegData = gdImageJpegPtr(image.p, &size, -1);
-
-    fwrite(rawJpegData, 1, size, out);
-    gdFree(rawJpegData);
-
-    fclose(out);
-}
-
-*/

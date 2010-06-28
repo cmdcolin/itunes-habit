@@ -21,7 +21,7 @@ bool normalizeCurrentDirectory()
 {
     std::vector<TCHAR> v(256);
     DWORD ret = 0;
-    
+
     ret = ::GetModuleFileName(0, &v[0], static_cast<DWORD>(v.size()));
 
     if(ret == 0)
@@ -53,10 +53,10 @@ bool normalizeCurrentDirectory()
 
 
 BOOL WINAPI DllMain(
-    HINSTANCE /* instance */,
-    DWORD reason,
-    LPVOID /* reserved */
-    )
+                    HINSTANCE /* instance */,
+                    DWORD reason,
+                    LPVOID /* reserved */
+                    )
 {
-	return TRUE;
+    return TRUE;
 }

@@ -18,19 +18,19 @@ public:
 
     StrX(const XMLCh * const toTranscode) :
       l(XMLString::transcode(toTranscode))
-    {
-    }
+      {
+      }
 
-    ~StrX(void)
-    {
-        XMLString::release(&l);
-    }
+      ~StrX(void)
+      {
+          XMLString::release(&l);
+      }
 
 
-    inline const char * local(void) const
-    {
-        return l;
-    }
+      inline const char * local(void) const
+      {
+          return l;
+      }
 
 
 private:
@@ -47,18 +47,18 @@ public:
 
     XStr(const char * const toTranscode) :
       u(XMLString::transcode(toTranscode))
-    {
-    }
+      {
+      }
 
-    ~XStr(void)
-    {
-        XMLString::release(&u);
-    }
+      ~XStr(void)
+      {
+          XMLString::release(&u);
+      }
 
-    inline const XMLCh * unicode(void) const
-    {
-        return u;
-    }
+      inline const XMLCh * unicode(void) const
+      {
+          return u;
+      }
 
 private:
 
@@ -104,17 +104,17 @@ class Filter :
 
 public:
 
-	Filter(unsigned long s = DOMNodeFilter::SHOW_ALL);
+    Filter(unsigned long s = DOMNodeFilter::SHOW_ALL);
 
-	virtual FilterAction acceptNode(const DOMNode *) const;
-	virtual unsigned long getWhatToShow(void) const { return show; }
-	virtual void setWhatToShow(unsigned long s) { show = s; }
+    virtual FilterAction acceptNode(const DOMNode *) const;
+    virtual unsigned long getWhatToShow(void) const { return show; }
+    virtual void setWhatToShow(unsigned long s) { show = s; }
 
 private:
 
-	Filter(const Filter &);
-	Filter & operator = (const Filter &);
+    Filter(const Filter &);
+    Filter & operator = (const Filter &);
 
-	unsigned long show;
+    unsigned long show;
 
 };

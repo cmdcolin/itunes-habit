@@ -1,5 +1,4 @@
 #include "imgCreator.hpp"
-#include "gdUtils.hpp"
 #include "xmlUtils.hpp"
 
 #include <xercesc/dom/DOMNodeList.hpp>
@@ -12,6 +11,10 @@
 #include <iomanip>
 
 #include <windows.h>
+
+#include <gd.h>
+#include <gdfontt.h>
+
 using namespace std;
 
 
@@ -42,7 +45,7 @@ void Creator::createLastPlayedChart(
     std::vector<char> v(font.begin(), font.end());
     v.push_back('\0');
 
-	std::stringstream fulltext;
+    std::stringstream fulltext;
 
     for(std::vector<const DOMElement *>::const_iterator i = arr.begin();
         i != arr.end(); ++i)
@@ -66,50 +69,53 @@ void Creator::createLastPlayedChart(
         char sss[800];
         ::WideCharToMultiByte(CP_UTF8, 0, &m[0], (int) m.size(), sss, sizeof(sss), 0, 0);
 
-fulltext << std::setfill('0') << std::setw(2) << t.wHour << ":"
+        fulltext << std::setfill('0') << std::setw(2) << t.wHour << ":"
             << std::setfill('0') << std::setw(2) << t.wMinute << " ";
-		fulltext << sss << endl;
-	}
+        fulltext << sss << endl;
+    }
 
 
 
-	// get bounding rectangle for the text
-	std::string fulltext_str(fulltext.str());
-	std::vector<char> fulltext_cstr(fulltext_str.begin(), fulltext_str.end());
-	fulltext_cstr.push_back('\0');
+    // get bounding rectangle for the text
+    std::string fulltext_str(fulltext.str());
+    std::vector<char> fulltext_cstr(fulltext_str.begin(), fulltext_str.end());
+    fulltext_cstr.push_back('\0');
 
-	char * err = gdImageStringFT(0, &bounds[0], 0, &v[0], fsize, 0.0, 0, 0, &fulltext_cstr[0]);
-	if(err)
-		cerr << __FUNCTION__ << "gdImageStringFT: " << err;
+    char * err = gdImageStringFT(0, &bounds[0], 0, &v[0], fsize, 0.0, 0, 0, &fulltext_cstr[0]);
+    if(err)
+        cerr << __FUNCTION__ << "gdImageStringFT: " << err;
 
-	int x = bounds[2]-bounds[6] + 6;
-	int y = bounds[3]-bounds[7] + 6;
+    int x = bounds[2]-bounds[6] + 6;
+    int y = bounds[3]-bounds[7] + 6;
 
-	gdWimage image(x, y);
+    gdImagePtr p = gdImageCreate(x, y);
 
-	unsigned int 
-		r = rr(170, 255), 
-		g = rr(170, 255), 
-		b = rr(170, 255);
+    unsigned int 
+        r = rr(170, 255), 
+        g = rr(170, 255), 
+        b = rr(170, 255);
 
-	int brush = gdImageColorResolve(image.p, r, g, b);
-	int pen = gdImageColorResolve(image.p, 0, 0, 0);
+    int brush = gdImageColorResolve(p, r, g, b);
+    int pen = gdImageColorResolve(p, 0, 0, 0);
 
-	gdImageFilledRectangle(image.p, 1, 1, image.p->sx - 2, image.p->sy - 2, brush);
-	gdImageRectangle(image.p, 0, 0, image.p->sx - 1, image.p->sy - 1, pen);
+    gdImageFilledRectangle(p, 1, 1, p->sx - 2, p->sy - 2, brush);
+    gdImageRectangle(p, 0, 0, p->sx - 1, p->sy - 1, pen);
 
-	x = 3 - bounds[6];
-	y = 3 - bounds[7];
+    x = 3 - bounds[6];
+    y = 3 - bounds[7];
 
-	err = gdImageStringFT(image.p, &bounds[0], pen, &v[0], fsize, 0.0, x, y, &fulltext_cstr[0]);
-	if(err)
-		cerr << __FUNCTION__ << "gdImageStringFT: " << err;
+    err = gdImageStringFT(p, &bounds[0], pen, &v[0], fsize, 0.0, x, y, &fulltext_cstr[0]);
+    if(err) {
+        gdImageDestroy(p);
+        cerr << __FUNCTION__ << "gdImageStringFT: " << err;
+    }
 
-	int size;
-	std::ofstream of(file.c_str(), ios::binary | ios::out);
-	void * pwrite = gdImagePngPtr(image.p, &size);
-	of.write((char *)pwrite, size);
-	gdFree(pwrite);
+    int size;
+    std::ofstream of(file.c_str(), ios::binary | ios::out);
+    void * pwrite = gdImagePngPtr(p, &size);
+    of.write((char *)pwrite, size);
+    gdFree(pwrite);
+    gdImageDestroy(p);
 }
 
 
@@ -180,11 +186,11 @@ void Creator::createDynaLastPlayed(const std::vector<const DOMElement *> & arr, 
     doc->getDocumentElement()->appendChild(items);
 
 
-	DOMLSSerializer* writer = impl->createLSSerializer();
-	DOMConfiguration* dc = writer->getDomConfig();
-	
+    DOMLSSerializer* writer = impl->createLSSerializer();
+    DOMConfiguration* dc = writer->getDomConfig();
 
-	writer->writeToString(doc, 0);
+
+    writer->writeToString(doc, 0);
     writer->release();
 
     delete doc;
