@@ -1,16 +1,16 @@
-#include <windows.h>
-#include <stdio.h>
+#include "guicon.h"
+
 #include <fcntl.h>
 #include <io.h>
+#include <windows.h>
 #include <iostream>
-#include <fstream>
+
 
 using namespace std;
 
 // maximum mumber of lines the output console should have
 
 static const WORD MAX_CONSOLE_LINES = 500;
-
 
 void RedirectIOToConsole()
 {

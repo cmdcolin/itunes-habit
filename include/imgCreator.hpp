@@ -21,8 +21,8 @@ public:
 
     void createLastPlayedChart(
         const vector<const DOMElement *> & arr, 
-        const basic_string<TCHAR> & file, 
-        const string & font, 
+        LPCTSTR file, 
+        LPSTR font, 
         int size) const;
 
     void createArtistGraph(
