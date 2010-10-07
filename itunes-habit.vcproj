@@ -2,7 +2,7 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9.00"
-	Name="Itunesplugin"
+	Name="itunes-habit"
 	ProjectGUID="{97724FCF-8681-46FC-A235-09D060835CA0}"
 	RootNamespace="Itunesplugin"
 	TargetFrameworkVersion="131072"
@@ -217,6 +217,34 @@
 				RelativePath=".\src\xmlUtils.cpp"
 				>
 			</File>
+			<Filter
+				Name="SQLite 3"
+				>
+				<File
+					RelativePath=".\src\sqlite\shell.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\sqlite\sqlite3.c"
+					>
+				</File>
+				<File
+					RelativePath=".\src\sqlite\sqlite3.def"
+					>
+				</File>
+				<File
+					RelativePath=".\src\sqlite\sqlite3.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\sqlite\sqlite3ext.h"
+					>
+				</File>
+				<File
+					RelativePath=".\src\sqlite\stdafx.h"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
