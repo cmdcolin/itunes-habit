@@ -533,11 +533,6 @@ static OSStatus VisualPluginHandler(
             {
                 vpd->loggy->log(vpd->trackUniInfo);
 
-                vpd->ic.createLastPlayedChart(
-                    vpd->loggy->lastPlayedSongs(5), 
-                    vpd->img_file.c_str(), 
-                    "C:\\at.ttf",
-                    24);
 
                 //
                 //#if defined(_UNICODE)
@@ -587,14 +582,6 @@ static OSStatus VisualPluginHandler(
             try
             {
                 vpd->loggy->log(vpd->trackUniInfo);
-
-                vpd->ic.createLastPlayedChart(
-                    vpd->loggy->lastPlayedSongs(1), 
-                    vpd->img_file.c_str(), 
-                    "C:\\at.ttf",
-                    72);
-
-
                 vpd->loggy->serialize(vpd->music_log_file);
             }
             catch(DOMException &)

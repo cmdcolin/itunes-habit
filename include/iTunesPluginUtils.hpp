@@ -7,23 +7,23 @@
 #include "iTunesVisualAPI.h"
 
 #include "xmlLog.hpp"
-#include "imgCreator.hpp"
 #include "httpUploader.hpp"
 
 #include <ctime>
 #include <string>
 #include <vector>
+#include <iostream>
+
+using namespace std;
 
 
-
-struct
-    VisualPluginDataz
+struct VisualPluginDataz
 {
     VisualPluginDataz(
-        const std::basic_string<TCHAR> & mlog,
-        const std::basic_string<TCHAR> & imgfike,
-        const std::basic_string<TCHAR> & grammar,
-        const std::basic_string<TCHAR> & elog
+        const basic_string<TCHAR> & mlog,
+        const basic_string<TCHAR> & imgfike,
+        const basic_string<TCHAR> & grammar,
+        const basic_string<TCHAR> & elog
         ) :
 
     music_log_file(mlog), error_log_file(elog),
@@ -78,14 +78,13 @@ struct
     Boolean	playing;
 
     Log *     loggy;
-    Creator   ic;
     Uploader  up;
 
-    std::basic_string<TCHAR> host;
-    std::basic_string<TCHAR> music_log_file;
-    std::basic_string<TCHAR> error_log_file;
-    std::basic_string<TCHAR> img_file;
-    std::basic_string<TCHAR> grammar_file;
+    basic_string<TCHAR> host;
+    basic_string<TCHAR> music_log_file;
+    basic_string<TCHAR> error_log_file;
+    basic_string<TCHAR> img_file;
+    basic_string<TCHAR> grammar_file;
 
 };
 
@@ -97,7 +96,7 @@ template <typename T>
 struct
     converter
 {
-    std::vector<T> r;
+    vector<T> r;
 
     template <typename U>
     void operator () (U u)

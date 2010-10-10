@@ -194,10 +194,6 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\src\imgCreator.cpp"
-				>
-			</File>
-			<File
 				RelativePath=".\src\iTunesAPI.cpp"
 				>
 			</File>
@@ -217,34 +213,6 @@
 				RelativePath=".\src\xmlUtils.cpp"
 				>
 			</File>
-			<Filter
-				Name="SQLite 3"
-				>
-				<File
-					RelativePath=".\src\sqlite\shell.c"
-					>
-				</File>
-				<File
-					RelativePath=".\src\sqlite\sqlite3.c"
-					>
-				</File>
-				<File
-					RelativePath=".\src\sqlite\sqlite3.def"
-					>
-				</File>
-				<File
-					RelativePath=".\src\sqlite\sqlite3.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\sqlite\sqlite3ext.h"
-					>
-				</File>
-				<File
-					RelativePath=".\src\sqlite\stdafx.h"
-					>
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -257,10 +225,6 @@
 			</File>
 			<File
 				RelativePath=".\include\httpUploader.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\imgCreator.hpp"
 				>
 			</File>
 			<File
@@ -299,6 +263,34 @@
 			>
 			<File
 				RelativePath=".\res\Resource.rc"
+				>
+			</File>
+		</Filter>
+		<Filter
+			Name="SQLite 3"
+			>
+			<File
+				RelativePath=".\sqlite\shell.c"
+				>
+			</File>
+			<File
+				RelativePath=".\sqlite\sqlite3.c"
+				>
+			</File>
+			<File
+				RelativePath=".\sqlite\sqlite3.def"
+				>
+			</File>
+			<File
+				RelativePath=".\sqlite\sqlite3.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sqlite\sqlite3ext.h"
+				>
+			</File>
+			<File
+				RelativePath=".\sqlite\stdafx.h"
 				>
 			</File>
 		</Filter>
