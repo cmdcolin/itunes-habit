@@ -1,4 +1,4 @@
-#include "iTunesPluginUtils.hpp"
+#include "iTunesPluginUtils.h"
 #include <strsafe.h>
 
 unsigned int seed()

@@ -1,13 +1,10 @@
 #pragma once
 
-#include <xercesc/dom/DOMException.hpp>
-#include <curl/curl.h>
 
 #include "iTunesAPI.h"
 #include "iTunesVisualAPI.h"
 
-#include "xmlLog.hpp"
-#include "sqlite/sqlite3.h"
+#include "SQLiteLog.h"
 
 
 #include <ctime>
@@ -40,34 +37,9 @@ public:
     void *			cookie;
     Boolean	        playing;
     string          m_dbfilename;
-    sqlite3 *       db;
 
 };
 
-//
-// Deprecated - Functor converts type U to type vector of T's. Work on this
-//
-
-template <typename T>
-struct
-    converter
-{
-    vector<T> r;
-
-    template <typename U>
-    void operator () (U u)
-    {
-        r.push_back(static_cast<T>(u));
-    }
-
-    T * str(void)
-    {
-        if(r.back() != 0)
-            r.push_back(0);
-
-        return &r.at(0);
-    }
-};
 
 unsigned int seed();
 bool NormalizeCurrentDirectory();

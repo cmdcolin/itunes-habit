@@ -48,14 +48,11 @@
 //########################################
 //	includes
 //########################################
-#include "stdafx.h"
-#undef DOMDocument
+
+
 #include "iTunesVisualAPI.h"
-#include "iTunesPluginUtils.hpp"
+#include "iTunesPluginUtils.h"
 #include "guicon.h"
-
-
-#include <commctrl.h>
 
 #if TARGET_OS_WIN32
 #define	MAIN iTunesPluginMain
@@ -100,8 +97,10 @@ struct VisualPluginData {
     RenderVisualData		renderData;
     UInt32				renderTimeStampID;
 
-    ITTrackInfo			trackInfo;
-    ITStreamInfo			streamInfo;
+    ITTrackInfoV1	trackInfo;
+    ITStreamInfoV1	streamInfo;
+    ITTrackInfo     trackUniInfo;
+    ITStreamInfo    streamUniInfo;
 
     Boolean				playing;
     Boolean				padding[3];
@@ -120,6 +119,10 @@ typedef struct VisualPluginData VisualPluginData;
 
 static Boolean	gColorFlag = TRUE;
 
+
+//########################################
+//	exported function prototypes
+//########################################
 
 
 extern OSStatus iTunesPluginMainMachO( OSType inMessage, PluginMessageInfo *inMessageInfoPtr, void *refCon );
@@ -167,11 +170,8 @@ static void ProcessRenderData( VisualPluginData *visualPluginDataPtr, const Rend
 //	RenderVisualPort
 //########################################
 
-static void RenderVisualPort(VisualPluginData *visualPluginData, GRAPHICS_DEVICE destPort,const Rect *destRect,Boolean onlyUpdate)
+static void RenderVisualPort(VisualPluginData *vpd, GRAPHICS_DEVICE destPort,const Rect *destRect,Boolean onlyUpdate)
 {
-
-    (void) visualPluginData;
-    (void) onlyUpdate;
 
     if (destPort == nil)
         return;
@@ -212,9 +212,9 @@ static void RenderVisualPort(VisualPluginData *visualPluginData, GRAPHICS_DEVICE
 
         hdc = GetDC(destPort);		
         if (gColorFlag)
-            hBrush = CreateSolidBrush(RGB((UInt16)visualPluginData->maxLevel[1]<<1, (UInt16)visualPluginData->maxLevel[1]<<1, (UInt16)visualPluginData->maxLevel[0]<<1));
+            hBrush = CreateSolidBrush(RGB((UInt16)vpd->maxLevel[1]<<1, (UInt16)vpd->maxLevel[1]<<1, (UInt16)vpd->maxLevel[0]<<1));
         else
-            hBrush = CreateSolidBrush(RGB((UInt16)visualPluginData->maxLevel[1]<<1, (UInt16)visualPluginData->maxLevel[1]<<1, (UInt16)visualPluginData->maxLevel[1]<<1));
+            hBrush = CreateSolidBrush(RGB((UInt16)vpd->maxLevel[1]<<1, (UInt16)vpd->maxLevel[1]<<1, (UInt16)vpd->maxLevel[1]<<1));
         FillRect(hdc, &srcRect, hBrush);
         DeleteObject(hBrush);
         ReleaseDC(destPort, hdc);
@@ -276,58 +276,6 @@ case kOKSettingID:
 }
 #endif
 
-//
-//string getFont(const string & folder)
-//{
-//    WIN32_FIND_DATAA wfd;
-//    DWORD dwError;
-//    HANDLE hFind = FindFirstFileA(folder.c_str(), &wfd);
-//
-//    vector<string> xx;
-//    int counter = 0;
-//
-//    if (hFind == INVALID_HANDLE_VALUE) 
-//    {
-//    } 
-//    else 
-//    {
-//        do 
-//        {
-//            string xxx = wfd.cFileName;
-//            if(xxx.length() > 4)
-//            {
-//                string subby = xxx.substr(xxx.length() - 4);
-//                if(subby == ".ttf")
-//                {
-//                    cout << __FUNCTION__
-//                        << ": " << ("C:\\" + string(wfd.cFileName)).c_str();
-//
-//                    xx.push_back("C:\\" + string(wfd.cFileName));
-//                    counter++;
-//                }
-//            }
-//        } 
-//        while(FindNextFileA(hFind, &wfd) != 0);
-//
-//        dwError = GetLastError();
-//        FindClose(hFind);
-//
-//        if (dwError != ERROR_NO_MORE_FILES) 
-//        {
-//        }
-//    }
-//
-//    string ss;
-//
-//    if(counter)
-//        ss =  xx[rand() % counter];
-//
-//    cout << __FUNCTION__
-//        << ": " << ss.c_str();
-//
-//    return ss;
-//}
-
 
 /*
 VisualPluginHandler
@@ -338,19 +286,14 @@ static OSStatus VisualPluginHandler(OSType message,
                                     void * refCon)
 {
     OSStatus status;
-    CVisualPlugin * vpd = (CVisualPlugin *)refCon;
+
+	VisualPluginData *	vpd;
+	vpd = (VisualPluginData*) refCon;
 
     status = noErr;
 
     switch (message)
     {    
-
-    case 0x4337:
-        {
-            cout << __FUNCTION__
-                << ": 0x4337";
-        }
-        break;
 
         /*
         Sent when the visual plugin is registered.  The plugin should do minimal
@@ -358,40 +301,24 @@ static OSStatus VisualPluginHandler(OSType message,
         */		
     case kVisualPluginInitMessage:
         {
-            cout << __FUNCTION__
-                << ": Init";
-
-            INITCOMMONCONTROLSEX icx;
-
-            icx.dwSize  = sizeof(INITCOMMONCONTROLSEX);
-            icx.dwICC   = ICC_TAB_CLASSES;
+            cout << __FUNCTION__ << ": Init";
 
             RedirectIOToConsole();
-            InitCommonControlsEx(&icx);
             NormalizeCurrentDirectory();
-            srand(seed());
 
-            //try
-            //{
-            //    XMLPlatformUtils::Initialize();
-            //}
+            //CVisualPlugin *p = new CVisualPlugin("db.sqlite");
 
-            //catch(XMLException & e)
-            //{
-            //    MessageBox(HWND_DESKTOP, TEXT("Xerces XML API failed to initialize"),
-            //        TEXT("Fatal Error"), MB_OK | MB_ICONEXCLAMATION);
+			vpd = (VisualPluginData*) calloc(1, sizeof(VisualPluginData));
+			if (!vpd)
+			{
+				status = memFullErr;
+				break;
+			}
 
-            //    MessageBox(0, e.getMessage(), TEXT("Fatal Error"), MB_OK);
+			vpd->appCookie	= messageInfo->u.initMessage.appCookie;
+			vpd->appProc	= messageInfo->u.initMessage.appProc;
 
-            //    status = unimpErr;
-            //}
-
-            vpd = new CVisualPlugin("db.sqlite");
-
-            vpd->cookie	= messageInfo->u.initMessage.appCookie;
-            vpd->proc = messageInfo->u.initMessage.appProc;
-
-            messageInfo->u.initMessage.refCon = vpd;
+			messageInfo->u.initMessage.refCon	= (void*) vpd;
         }
         break;
 
@@ -402,7 +329,8 @@ static OSStatus VisualPluginHandler(OSType message,
         {
             cout << __FUNCTION__ << ": Cleanup";
 
-            delete vpd;
+			if (vpd)
+				free(vpd);
         }
         break;
 
@@ -418,7 +346,7 @@ static OSStatus VisualPluginHandler(OSType message,
         Sent if the plugin requests idle messages.  Do this by setting the kVisualWantsIdleMessages
         option in the RegisterVisualMessage.options field.
         */
-    case kVisualPluginIdleMessage:
+    case kVisualPluginIdleMessage:			
         break;
 
         /*

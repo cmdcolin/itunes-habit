@@ -117,7 +117,7 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;C:\Hell\xerces-c-3.0.1\src&quot;;&quot;C:\Hell\curl-7.19.4\include&quot;;&quot;C:\Hell\gd-2.0.35\&quot;;res;include"
+				AdditionalIncludeDirectories=".;res;include"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;WIN32;PLATFORM_WIN32;XML_LIBRARY;CURL_STATICLIB;XERCES_STATIC_LIBRARY"
 				RuntimeLibrary="2"
 				WarningLevel="4"
@@ -136,8 +136,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/nodefaultlib:&quot;libcmt.lib&quot;"
-				AdditionalDependencies="xerces-c_static_3.lib libcurl.lib bgd.lib user32.lib kernel32.lib gdi32.lib comctl32.lib ws2_32.lib wldap32.lib"
-				AdditionalLibraryDirectories="&quot;C:\Hell\xerces-c-3.0.1\Build\Win32\VC9\Static Release&quot;;&quot;C:\Hell\gd-2.0.35\bgd.dir\Release&quot;;&quot;C:\Hell\curl-7.19.7\lib\LIB-Release&quot;"
+				AdditionalLibraryDirectories=""
 				IgnoreAllDefaultLibraries="false"
 				GenerateDebugInformation="true"
 				OptimizeReferences="2"
@@ -194,7 +193,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\xmlLog.cpp"
+				RelativePath=".\src\SQLiteLog.cpp"
 				>
 			</File>
 		</Filter>
@@ -212,7 +211,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\iTunesPluginUtils.hpp"
+				RelativePath=".\include\iTunesPluginUtils.h"
 				>
 			</File>
 			<File
@@ -224,11 +223,7 @@
 				>
 			</File>
 			<File
-				RelativePath=".\include\stdafx.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\xmlLog.hpp"
+				RelativePath=".\include\SQLiteLog.h"
 				>
 			</File>
 		</Filter>

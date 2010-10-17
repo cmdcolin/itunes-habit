@@ -1,10 +1,12 @@
-#include "xmlLog.hpp"
+#include "SQLiteLog.h"
 #include "iTunesVisualAPI.h"
 
 
 
 CSQLiteLog::CSQLiteLog(const string &filename)
 {
+    cout << __FUNCTION__ << "\n";
+
     if(sqlite3_open(filename.c_str(), &db) != SQLITE_OK) {
         sqlite3_close(db);
         cout << "sqlite3_open" << " " << sqlite3_errmsg(db) << "\n";
@@ -16,15 +18,13 @@ CSQLiteLog::CSQLiteLog(const string &filename)
 
     sqlite3_prepare(db, sz, strlen(sz), &stmt, &err);
     sqlite3_step(stmt);
-
-    cout << __FUNCTION__ << "\n";
 }
 
 
 CSQLiteLog::~CSQLiteLog()
 {
-    sqlite3_close(db);
     cout << __FUNCTION__ << "\n";
+    sqlite3_close(db);
 }
 
 void CSQLiteLog::serialize(const string& s) const
