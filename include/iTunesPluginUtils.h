@@ -24,24 +24,11 @@ public:
     CVisualPlugin(const string & database) : m_dbfilename(database)
     {
         cout << __FUNCTION__ << "\n";
-
-        if(sqlite3_open(database.c_str(), &db) != SQLITE_OK) {
-            sqlite3_close(db);
-            cout << "sqlite3_open" << " " << sqlite3_errmsg(db) << "\n";
-        }
-
-        sqlite3_stmt *stmt;
-        const char *sz = "create table t1 (t1key INTEGER PRIMARY KEY,data TEXT,num double,timeEnter DATE);";
-        const char *err;
-
-        sqlite3_prepare(db, sz, strlen(sz), &stmt, &err);
-        sqlite3_step(stmt);
     }
 
     ~CVisualPlugin()
     {
         cout << __FUNCTION__ << "\n";
-        sqlite3_close(db);
     }
 
     ITAppProcPtr	proc;

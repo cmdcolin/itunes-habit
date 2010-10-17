@@ -3,37 +3,33 @@
 
 
 
-CSQLiteLog::CSQLiteLog(sqlite3 * ptr)
+CSQLiteLog::CSQLiteLog(const string &filename)
 {
-    db = ptr;
+    if(sqlite3_open(filename.c_str(), &db) != SQLITE_OK) {
+        sqlite3_close(db);
+        cout << "sqlite3_open" << " " << sqlite3_errmsg(db) << "\n";
+    }
+
+    sqlite3_stmt *stmt;
+    const char *sz = "create table t1 (t1key INTEGER PRIMARY KEY,d1 TEXT,d2 TEXT,d3 TEXT);";
+    const char *err;
+
+    sqlite3_prepare(db, sz, strlen(sz), &stmt, &err);
+    sqlite3_step(stmt);
+
     cout << __FUNCTION__ << "\n";
 }
 
 
-CSQLiteLog::~CSQLiteLog(void)
+CSQLiteLog::~CSQLiteLog()
 {
+    sqlite3_close(db);
     cout << __FUNCTION__ << "\n";
 }
 
 void CSQLiteLog::serialize(const string& s) const
 {
     cout << __FUNCTION__ << "\n";
-
-
-
-    //DOMImplementationLS * impl = (DOMImplementationLS *)
-    //    DOMImplementationRegistry::getDOMImplementation(XS("LS"));
-
-    //DOMLSSerializer* writer = impl->createLSSerializer();
-
-    //DOMConfiguration* dc = writer->getDomConfig();
-
-
-    //writer->writeToString(m_doc, 0);
-    ////writer->writeNode(ft, *m_doc);
-    //writer->release();
-
-    //delete ft;
 }
 
 void CSQLiteLog::log(ITTrackInfoV1 & ti)
@@ -56,6 +52,7 @@ void CSQLiteLog::log(ITTrackInfoV1 & ti)
 
     sqlite3_stmt *stmt;
     const char *err;
+
     char *sz = "insert into t1 VALUES(%s, %s, %s)";
     sqlite3_prepare(db, sz, strlen(sz), &stmt, &err);
     sqlite3_step(stmt);

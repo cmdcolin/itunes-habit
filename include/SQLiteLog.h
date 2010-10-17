@@ -17,7 +17,7 @@ class CSQLiteLog {
 
 public:
 
-    CSQLiteLog(sqlite3 * ptr);
+    CSQLiteLog(const string &s);
     ~CSQLiteLog(void);
 
     void log(ITTrackInfoV1 & ti);
