@@ -18,7 +18,7 @@ using namespace std;
 unsigned int seed();
 bool NormalizeCurrentDirectory();
 
-static OSStatus VisualPluginHandler(OSType message,
+OSStatus VisualPluginHandler(OSType message,
                                     VisualPluginMessageInfo * messageInfo,
                                     void * refCon);
 

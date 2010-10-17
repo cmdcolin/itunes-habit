@@ -33,7 +33,7 @@ enum
 struct VisualPluginData {
 
     
-    VisualPluginData()
+    VisualPluginData() : log("test.sqlite")
     {
         cout << __FUNCTION__ << "\n";
     }
@@ -43,7 +43,7 @@ struct VisualPluginData {
         cout << __FUNCTION__ << "\n";
     }
 
-
+    CSQLiteLog log;
     void *				appCookie;
     ITAppProcPtr			appProc;
 

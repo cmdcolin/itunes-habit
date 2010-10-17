@@ -196,6 +196,10 @@
 				RelativePath=".\src\SQLiteLog.cpp"
 				>
 			</File>
+			<File
+				RelativePath=".\src\VisualPluginHandler.cpp"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
