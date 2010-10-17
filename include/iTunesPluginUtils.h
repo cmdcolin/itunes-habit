@@ -15,32 +15,6 @@
 using namespace std;
 
 
-class CVisualPlugin {
-public:
-
-    CVisualPlugin(const string & database) : m_dbfilename(database)
-    {
-        cout << __FUNCTION__ << "\n";
-    }
-
-    ~CVisualPlugin()
-    {
-        cout << __FUNCTION__ << "\n";
-    }
-
-    ITAppProcPtr	proc;
-    ITTrackInfoV1	trackInfo;
-    ITStreamInfoV1	streamInfo;
-    ITTrackInfo     trackUniInfo;
-    ITStreamInfo    streamUniInfo;
-
-    void *			cookie;
-    Boolean	        playing;
-    string          m_dbfilename;
-
-};
-
-
 unsigned int seed();
 bool NormalizeCurrentDirectory();
 

@@ -25,7 +25,6 @@ bool NormalizeCurrentDirectory()
 
     if(!GetModuleFileName(0, buffer, MAX_PATH))
     {
-        cout << "Failed at GetModuleFileName" << "\n";
         return false;
     }
 
@@ -43,7 +42,6 @@ bool NormalizeCurrentDirectory()
 
     if(!SetCurrentDirectory(substr))
     {
-        cout << "Failed at SetCurrentDirectory" << "\n";
         return false;
     }
 

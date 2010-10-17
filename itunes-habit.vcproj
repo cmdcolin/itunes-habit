@@ -226,6 +226,10 @@
 				RelativePath=".\include\SQLiteLog.h"
 				>
 			</File>
+			<File
+				RelativePath=".\include\VisualPluginData.h"
+				>
+			</File>
 		</Filter>
 		<Filter
 			Name="Resource Files"

@@ -52,66 +52,11 @@
 
 #include "iTunesVisualAPI.h"
 #include "iTunesPluginUtils.h"
+#include "VisualPluginData.h"
 #include "guicon.h"
 
-#if TARGET_OS_WIN32
-#define	MAIN iTunesPluginMain
-#define IMPEXP	__declspec(dllexport)
-#else
-#define IMPEXP
-#define	MAIN main
-#endif
-
-//########################################
-//	typedef's, struct's, enum's, etc.
-//########################################
-#define kTVisualPluginName              "\014iTunesPlugIn"
-#define	kTVisualPluginCreator			'hook'
-
-#define	kTVisualPluginMajorVersion		1
-#define	kTVisualPluginMinorVersion		2
-#define	kTVisualPluginReleaseStage		developStage
-#define	kTVisualPluginNonFinalRelease	0
 
 
-
-enum
-{
-    kColorSettingID = 3, 
-    kOKSettingID = 5
-};
-
-struct VisualPluginData {
-    void *				appCookie;
-    ITAppProcPtr			appProc;
-
-#if TARGET_OS_MAC
-    CGrafPtr			destPort;
-#else
-    HWND				destPort;
-#endif
-    Rect				destRect;
-    OptionBits			destOptions;
-    UInt32				destBitDepth;
-
-    RenderVisualData		renderData;
-    UInt32				renderTimeStampID;
-
-    ITTrackInfoV1	trackInfo;
-    ITStreamInfoV1	streamInfo;
-    ITTrackInfo     trackUniInfo;
-    ITStreamInfo    streamUniInfo;
-
-    Boolean				playing;
-    Boolean				padding[3];
-
-    //	Plugin-specific data
-    UInt8				minLevel[kVisualMaxDataChannels];		// 0-128
-    UInt8				maxLevel[kVisualMaxDataChannels];		// 0-128
-
-    UInt8				min, max;
-};
-typedef struct VisualPluginData VisualPluginData;
 
 //########################################
 //	local ( static ) globals
@@ -301,19 +246,12 @@ static OSStatus VisualPluginHandler(OSType message,
         */		
     case kVisualPluginInitMessage:
         {
-            cout << __FUNCTION__ << ": Init";
-
             RedirectIOToConsole();
-            NormalizeCurrentDirectory();
+            cout << __FUNCTION__ << ": Init";
 
             //CVisualPlugin *p = new CVisualPlugin("db.sqlite");
 
-			vpd = (VisualPluginData*) calloc(1, sizeof(VisualPluginData));
-			if (!vpd)
-			{
-				status = memFullErr;
-				break;
-			}
+			vpd = new VisualPluginData;
 
 			vpd->appCookie	= messageInfo->u.initMessage.appCookie;
 			vpd->appProc	= messageInfo->u.initMessage.appProc;
@@ -329,8 +267,7 @@ static OSStatus VisualPluginHandler(OSType message,
         {
             cout << __FUNCTION__ << ": Cleanup";
 
-			if (vpd)
-				free(vpd);
+			delete vpd;
         }
         break;
 
