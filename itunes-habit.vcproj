@@ -40,7 +40,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;C:\Hell\xerces-c-3.0.1\src&quot;;&quot;C:\Hell\curl-7.19.4\include&quot;;C:\Hell\Libgd\include;res;include"
+				AdditionalIncludeDirectories="&quot;C:\Hell\xerces-c-3.0.1\src&quot;;&quot;C:\Hell\curl-7.19.4\include&quot;;C:\Hell\Libgd\include;res;.;include"
 				PreprocessorDefinitions="WIN32_LEAN_AND_MEAN;_CRT_SECURE_NO_WARNINGS"
 				MinimalRebuild="false"
 				BasicRuntimeChecks="0"
@@ -182,18 +182,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\src\httpUploader.cpp"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						AdditionalIncludeDirectories="include;res;"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
 				RelativePath=".\src\iTunesAPI.cpp"
 				>
 			</File>
@@ -209,10 +197,6 @@
 				RelativePath=".\src\xmlLog.cpp"
 				>
 			</File>
-			<File
-				RelativePath=".\src\xmlUtils.cpp"
-				>
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -221,10 +205,6 @@
 			>
 			<File
 				RelativePath=".\include\guicon.h"
-				>
-			</File>
-			<File
-				RelativePath=".\include\httpUploader.hpp"
 				>
 			</File>
 			<File
@@ -249,10 +229,6 @@
 			</File>
 			<File
 				RelativePath=".\include\xmlLog.hpp"
-				>
-			</File>
-			<File
-				RelativePath=".\include\xmlUtils.hpp"
 				>
 			</File>
 		</Filter>

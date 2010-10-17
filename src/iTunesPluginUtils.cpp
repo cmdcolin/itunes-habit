@@ -1,5 +1,5 @@
 #include "iTunesPluginUtils.hpp"
-
+#include <strsafe.h>
 
 unsigned int seed()
 {
@@ -21,7 +21,7 @@ bool NormalizeCurrentDirectory()
 {
     TCHAR buffer[MAX_PATH];
     TCHAR substr[MAX_PATH];
-    long long ret = 0;
+    long ret = 0;
 
     if(!GetModuleFileName(0, buffer, MAX_PATH))
     {
@@ -29,13 +29,17 @@ bool NormalizeCurrentDirectory()
         return false;
     }
 
-    // find last backslash
+    // reverse find backslash
+#ifndef UNICODE
+    ret = strrchr(buffer, '\\') - buffer;
+#else
     ret = wcsrchr(buffer, L'\\') - buffer;
+#endif
 
 
-    // copy ret characters into substr
-    wcsncpy(substr, buffer, ret);
-    substr[ret] = L'\0';
+    // copy up to last backslash
+    StringCchCopy(substr, ret, buffer);
+    substr[ret] = TEXT('\0');
 
     if(!SetCurrentDirectory(substr))
     {
@@ -47,11 +51,9 @@ bool NormalizeCurrentDirectory()
 }
 
 
-BOOL WINAPI DllMain(
-                    HINSTANCE /* instance */,
+BOOL WINAPI DllMain(HINSTANCE /* instance */,
                     DWORD /* reason */,
-                    LPVOID /* reserved */
-                    )
+                    LPVOID /* reserved */)
 {
     return TRUE;
 }

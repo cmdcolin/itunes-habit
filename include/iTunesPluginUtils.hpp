@@ -7,7 +7,8 @@
 #include "iTunesVisualAPI.h"
 
 #include "xmlLog.hpp"
-#include "httpUploader.hpp"
+#include "sqlite/sqlite3.h"
+
 
 #include <ctime>
 #include <string>
@@ -17,74 +18,42 @@
 using namespace std;
 
 
-struct VisualPluginDataz
-{
-    VisualPluginDataz(
-        const basic_string<TCHAR> & mlog,
-        const basic_string<TCHAR> & imgfike,
-        const basic_string<TCHAR> & grammar,
-        const basic_string<TCHAR> & elog
-        ) :
+class CVisualPlugin {
+public:
 
-    music_log_file(mlog), error_log_file(elog),
-        img_file(imgfike), grammar_file(grammar)
-
+    CVisualPlugin(const string & database) : m_dbfilename(database)
     {
         cout << __FUNCTION__ << "\n";
 
-        try
-        {
-            HANDLE file = ::CreateFile(mlog.c_str(), GENERIC_READ,
-                FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0);
+        if(sqlite3_open(database.c_str(), &db) != SQLITE_OK) {
+            sqlite3_close(db);
+            cout << "sqlite3_open" << " " << sqlite3_errmsg(db) << "\n";
+        }
 
-            if(file == INVALID_HANDLE_VALUE &&
-                ::GetLastError() == ERROR_FILE_NOT_FOUND)
-            {
-                loggy = new Log(grammar_file.c_str(), false);
-            }
-            else
-            {
-                ::CloseHandle(file);
+        sqlite3_stmt *stmt;
+        const char *sz = "create table t1 (t1key INTEGER PRIMARY KEY,data TEXT,num double,timeEnter DATE);";
+        const char *err;
 
-                loggy = new Log(music_log_file.c_str(), true);
-            }
-        }
-        catch(XMLException & e)
-        {
-            cout << SX(e.getMessage()) << "\n";
-        }
-        catch(DOMException & e)
-        {
-            cout << SX(e.getMessage()) << "\n";
-        }
+        sqlite3_prepare(db, sz, strlen(sz), &stmt, &err);
+        sqlite3_step(stmt);
     }
 
-    ~VisualPluginDataz()
+    ~CVisualPlugin()
     {
         cout << __FUNCTION__ << "\n";
-
-        delete loggy;
+        sqlite3_close(db);
     }
 
-    void *			cookie;
     ITAppProcPtr	proc;
-
     ITTrackInfoV1	trackInfo;
     ITStreamInfoV1	streamInfo;
-
     ITTrackInfo     trackUniInfo;
     ITStreamInfo    streamUniInfo;
 
-    Boolean	playing;
-
-    Log *     loggy;
-    Uploader  up;
-
-    basic_string<TCHAR> host;
-    basic_string<TCHAR> music_log_file;
-    basic_string<TCHAR> error_log_file;
-    basic_string<TCHAR> img_file;
-    basic_string<TCHAR> grammar_file;
+    void *			cookie;
+    Boolean	        playing;
+    string          m_dbfilename;
+    sqlite3 *       db;
 
 };
 
@@ -116,34 +85,22 @@ struct
 unsigned int seed();
 bool NormalizeCurrentDirectory();
 
-static OSStatus VisualPluginHandler(
-                                    OSType message,
+static OSStatus VisualPluginHandler(OSType message,
                                     VisualPluginMessageInfo * messageInfo,
-                                    void * refCon
-                                    );
+                                    void * refCon);
 
 
-
-DWORD WINAPI ThreadProc(LPVOID t);
-
-
-
-BOOL CALLBACK DlgProc(
-                      HWND dlg,
+BOOL CALLBACK DlgProc(HWND dlg,
                       UINT message,
                       WPARAM wParam,
-                      LPARAM lParam
-                      );
+                      LPARAM lParam);
 
-BOOL WINAPI DllMain(
-                    HINSTANCE /* instance */,
+BOOL WINAPI DllMain(HINSTANCE /* instance */,
                     DWORD reason,
-                    LPVOID /* reserved */
-                    );
+                    LPVOID /* reserved */);
 
 
 extern "C" __declspec(dllexport) OSStatus iTunesPluginMain(
     OSType message,
     PluginMessageInfo * messageInfo,
-    void * /* refCon */
-    );
+    void * /* refCon */);

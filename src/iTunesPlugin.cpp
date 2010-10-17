@@ -333,14 +333,12 @@ case kOKSettingID:
 VisualPluginHandler
 */
 
-static OSStatus VisualPluginHandler(
-                                    OSType message, 
+static OSStatus VisualPluginHandler(OSType message, 
                                     VisualPluginMessageInfo * messageInfo, 
-                                    void * refCon
-                                    )
+                                    void * refCon)
 {
-    OSStatus			status;
-    VisualPluginDataz *  vpd     = static_cast<VisualPluginDataz *>(refCon);
+    OSStatus status;
+    CVisualPlugin * vpd = (CVisualPlugin *)refCon;
 
     status = noErr;
 
@@ -388,7 +386,7 @@ static OSStatus VisualPluginHandler(
             //    status = unimpErr;
             //}
 
-            vpd = new VisualPluginDataz(TEXT("C:/testestubertest.xml"), TEXT("C:/img.jpg"), TEXT("C:/log.dtd"), TEXT("C:/errors.log"));
+            vpd = new CVisualPlugin("db.sqlite");
 
             vpd->cookie	= messageInfo->u.initMessage.appCookie;
             vpd->proc = messageInfo->u.initMessage.appProc;
@@ -402,12 +400,9 @@ static OSStatus VisualPluginHandler(
         */		
     case kVisualPluginCleanupMessage:
         {
-            cout << __FUNCTION__
-                << ": Cleanup";
+            cout << __FUNCTION__ << ": Cleanup";
 
             delete vpd;
-
-            XMLPlatformUtils::Terminate();
         }
         break;
 
@@ -529,28 +524,8 @@ static OSStatus VisualPluginHandler(
 
             vpd->playing = true;
 
-            try
-            {
-                vpd->loggy->log(vpd->trackUniInfo);
-
-
-                //
-                //#if defined(_UNICODE)
-                //                if(!vpd->up.uploadFile(SX(vpd->img_file.c_str())))
-                //#else
-                //                if(!vpd->up.uploadFile(vpd->img_file.c_str()))
-                //#endif
-
-                {
-                    cout << "Upload failed";
-                }
-
-                vpd->loggy->serialize(vpd->music_log_file);
-            }
-            catch(DOMException & e)
-            {
-                cout << "DOM Exception: " << e.getMessage();
-            }
+            // vpd->loggy->log(vpd->trackUniInfo);
+            // vpd->loggy->serialize(vpd->music_log_file);
         }
         break;
 
@@ -579,15 +554,8 @@ static OSStatus VisualPluginHandler(
 
             vpd->playing = true;
 
-            try
-            {
-                vpd->loggy->log(vpd->trackUniInfo);
-                vpd->loggy->serialize(vpd->music_log_file);
-            }
-            catch(DOMException &)
-            {
-                cout << "DOM Exception";
-            }
+            // vpd->loggy->log(vpd->trackUniInfo);
+            // vpd->loggy->serialize(vpd->music_log_file);
         }
         break;
 
