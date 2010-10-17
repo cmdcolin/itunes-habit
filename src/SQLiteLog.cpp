@@ -43,19 +43,25 @@ void CSQLiteLog::log(ITTrackInfoV1 & ti)
     
 
 
+    char *zSQL = sqlite3_mprintf("INSERT INTO t1 VALUES(NULL,%Q,%Q,%Q)", artist.c_str(), song.c_str(), album.c_str());
 
-    const char *sz = "INSERT INTO t1 VALUES(%d,%Q,%Q,%Q)";
+
+    sqlite3_exec(db, zSQL, 0, 0, 0);
+    sqlite3_free(zSQL);
+
+
+    /*const char *sz = "INSERT INTO t1 VALUES(%d,%Q,%Q,%Q)";
     const char *err;
     sqlite3_stmt *stmt;
-    char * jz = sqlite3_mprintf(sz, 6, artist.c_str(), song.c_str(), album.c_str());
+    char * jz = sqlite3_mprintf(sz, 7, artist.c_str(), song.c_str(), album.c_str());
     cout << "here " << jz << "\n";
 
     sqlite3_prepare(db, jz, strlen(sz), &stmt, &err);
     sqlite3_step(stmt);
-    sqlite3_free(jz);
-    sqlite3_finalize(stmt);
+    sqlite3_free(jz);*/
+    //sqlite3_finalize(stmt);
 
-    cout << "here 2 " << err << "\n";
+    cout << "here 2 " << sqlite3_errmsg(db) << "\n";
     //m_doc->getDocumentElement()->appendChild(song);
 }
 
@@ -90,9 +96,12 @@ int CSQLiteLog::lastPlayedSongs(unsigned int n, vector<string> &v) const
     sqlite3_stmt  *stmt;
     sqlite3_prepare(db, sz, strlen(sz), &stmt, &err);
 
-    for(int i = 0; i < n; i++) {
-        sqlite3_step(stmt);
-        cout << "here";
+    while( SQLITE_ROW==sqlite3_step(stmt) ){
+        for(int i=1; i<= 3; i++){
+            const char *zText = (const char *)sqlite3_column_text(stmt, i);
+            cout << zText << " ";
+        }
+        cout << "\n";
     }
 
     return 0;

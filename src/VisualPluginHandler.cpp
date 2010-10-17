@@ -32,6 +32,7 @@ void SongPlay(VisualPluginMessageInfo * messageInfo, VisualPluginData *vpd)
     vpd->playing = true;
 
     vpd->log.log(vpd->trackInfo);
+    vpd->log.lastPlayedSongs(5, vector<string>());
     // vpd->loggy->log(vpd->trackUniInfo);
     // vpd->loggy->serialize(vpd->music_log_file);
 }
@@ -49,6 +50,7 @@ void SongChange(VisualPluginMessageInfo * messageInfo, VisualPluginData *vpd)
     vpd->playing = true;
 
     vpd->log.log(vpd->trackInfo);
+    vpd->log.lastPlayedSongs(5, vector<string>());
     // vpd->loggy->log(vpd->trackUniInfo);
     // vpd->loggy->serialize(vpd->music_log_file);
 }
