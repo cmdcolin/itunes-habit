@@ -22,9 +22,7 @@ public:
 
     void log(ITTrackInfoV1 & ti);
     void log(ITTrackInfo & ti);
-
-    void serialize(const string & s) const;
-    int lastPlayedSongs(unsigned int n, vector<string> &v) const;
+    int lastPlayedSongs(unsigned int n) const;
 
 private:
 

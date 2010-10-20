@@ -50,17 +50,6 @@ void CSQLiteLog::log(ITTrackInfoV1 & ti)
     sqlite3_free(zSQL);
 
 
-    /*const char *sz = "INSERT INTO t1 VALUES(%d,%Q,%Q,%Q)";
-    const char *err;
-    sqlite3_stmt *stmt;
-    char * jz = sqlite3_mprintf(sz, 7, artist.c_str(), song.c_str(), album.c_str());
-    cout << "here " << jz << "\n";
-
-    sqlite3_prepare(db, jz, strlen(sz), &stmt, &err);
-    sqlite3_step(stmt);
-    sqlite3_free(jz);*/
-    //sqlite3_finalize(stmt);
-
     cout << "here 2 " << sqlite3_errmsg(db) << "\n";
     //m_doc->getDocumentElement()->appendChild(song);
 }
@@ -87,20 +76,22 @@ void CSQLiteLog::log(ITTrackInfo & ti)
 
 
 
-int CSQLiteLog::lastPlayedSongs(unsigned int n, vector<string> &v) const
+int CSQLiteLog::lastPlayedSongs(unsigned int n) const
 {
     cout << __FUNCTION__ << "\n";
 
-    const char *sz = "select * from t1";
+    int it = 0;
+    const char *sz = "SELECT * FROM t1 GROUP BY t1.artist";
     const char *err;
     sqlite3_stmt  *stmt;
     sqlite3_prepare(db, sz, strlen(sz), &stmt, &err);
 
-    while( SQLITE_ROW==sqlite3_step(stmt) ){
+    while( SQLITE_ROW==sqlite3_step(stmt) && it < n ){
         for(int i=1; i<= 3; i++){
             const char *zText = (const char *)sqlite3_column_text(stmt, i);
             cout << zText << " ";
         }
+        it++;
         cout << "\n";
     }
 
